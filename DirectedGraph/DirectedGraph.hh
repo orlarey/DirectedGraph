@@ -26,7 +26,8 @@
 //===========================================================
 
 template <typename N>
-class digraph {
+class digraph
+{
     using TWeights      = std::set<int>;
     using TDestinations = std::map<N, TWeights>;
 
@@ -36,7 +37,8 @@ class digraph {
     // Real/internal structure of a graph. A graph is a set of nodes
     // and a set of connections between theses nodes. These connections
     // have integer values attached.
-    class internalgraph {
+    class internalgraph
+    {
        private:
         std::set<N>                fNodes;        // {n1,n2,...}
         std::map<N, TDestinations> fConnections;  // {(ni -{d1,d2,...}-> nj),...}
@@ -70,10 +72,10 @@ class digraph {
         //----------------------------------------------------------------------
 
         // returns the set of nodes of the graph
-        [[nodiscard]] const std::set<N>& nodes() const
-        {
-            return fNodes;
-        }
+        [[nodiscard]] const std::set<N>& nodes() const { return fNodes; }
+
+        // returns the set of nodes of the graph
+        [[nodiscard]] const std::map<N, TDestinations>& connections() const { return fConnections; }
 
         // Returns the destinations of node n in the graph
         [[nodiscard]] const TDestinations& destinations(const N& n) const
@@ -142,22 +144,16 @@ class digraph {
     //--------------------------------------------------------------------------
 
     // returns the set of nodes of the graph
-    [[nodiscard]] const std::set<N>& nodes() const
-    {
-        return fContent->nodes();
-    }
+    [[nodiscard]] const std::set<N>& nodes() const { return fContent->nodes(); }
+
+    // returns the set of nodes of the graph
+    [[nodiscard]] const std::map<N, TDestinations>& connections() const { return fContent->connections(); }
 
     // returns the destinations of node n in the graph
-    [[nodiscard]] const TDestinations& destinations(const N& n) const
-    {
-        return fContent->destinations(n);
-    }
+    [[nodiscard]] const TDestinations& destinations(const N& n) const { return fContent->destinations(n); }
 
     // returns the weights of the connections between two nodes
-    [[nodiscard]] const TWeights& weights(const N& n1, const N& n2) const
-    {
-        return fContent->weights(n1, n2);
-    }
+    [[nodiscard]] const TWeights& weights(const N& n1, const N& n2) const { return fContent->weights(n1, n2); }
 
     //--------------------------------------------------------------------------
     // Methods used to query the graph
@@ -189,10 +185,11 @@ class digraph {
 
     friend bool operator<(const digraph& p1, const digraph& p2)
     {
-        return p1.fContent < p2.fContent;
+        return (p1.nodes() < p2.nodes()) || ((p1.nodes() == p2.nodes()) && (p1.connections() < p2.connections()));
     }
+
     friend bool operator==(const digraph& p1, const digraph& p2)
     {
-        return p1.fContent == p2.fContent;
+        return p1.nodes() == p2.nodes() && p1.connections() == p2.connections();
     }
 };
