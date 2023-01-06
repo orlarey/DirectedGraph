@@ -1,0 +1,21 @@
+name: Ubuntu
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: create cmake project
+      run: cmake -B build -S .
+    - name: build cmake project
+      run: cmake --build build/ --target all
+    - name: execute test
+      run: ./build/test
