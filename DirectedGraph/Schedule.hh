@@ -39,7 +39,7 @@ class schedule
 
    public:
     // number of elements in the schedule
-    [[nodiscard]] int size() const { return fElements.size(); }
+    [[nodiscard]] size_t size() const { return fElements.size(); }
 
     // the vector of elements (for iterations)
     [[nodiscard]] const std::vector<N>& elements() const { return fElements; }

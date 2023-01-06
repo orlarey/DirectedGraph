@@ -16,5 +16,5 @@ jobs:
     - name: build cmake project
       run: cmake --build build --config Release
     - name: execute test
-      run: ./build/Release/TestInterval.exe
+      run: ./build/Release/test.exe
 
