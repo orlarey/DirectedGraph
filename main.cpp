@@ -6,8 +6,6 @@
 //  Copyright © 2017-2019 GRAME. All rights reserved.
 //
 
-#include <cassert>
-#include <fstream>
 #include <iostream>
 
 #include "tests.hh"
