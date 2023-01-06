@@ -9,6 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 # add the executable
-add_executable(test main.cpp)
+include_directories(DirectedGraph)
+
+add_executable(test main.cpp tests.cpp tests.hh DirectedGraph/Schedule.hh DirectedGraph/DirectedGraph.hh DirectedGraph/DirectedGraphAlgorythm.hh)
 
 

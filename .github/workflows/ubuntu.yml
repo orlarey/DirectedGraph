@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Ubuntu
 
 on:
   push:
@@ -12,12 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: cmake
-      run: mkdir build
-    - name: cmake build
-      run: cmake -Bbuild -H.
-    - name: cmake make
+    - uses: actions/checkout@v3
+    - name: create cmake project
+      run: cmake -B build -S .
+    - name: build cmake project
       run: cmake --build build/ --target all
-    - name: test
+    - name: execute test
       run: ./build/test
