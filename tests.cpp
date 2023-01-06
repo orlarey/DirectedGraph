@@ -293,6 +293,10 @@ void test6(std::ostream& ss)
     ss << "number of cycles: " << cycles(g) << "; ";
     auto gc = cut(g, 1);
     ss << "gc = " << gc << "; ";
+    auto h = graph2dag(g);  // on fait un dag dont les noeuds sont les cycles du graphe g
+    ss << "graph2dag(g)    = " << h << "; ";
+    auto p = parallelize(h);  //
+    ss << "parallelize(h)  = " << p << "; ";
 }
 
 std::string res6()
@@ -300,7 +304,13 @@ std::string res6()
     return "test6:        g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{1}->E, "
            "E-set{0}->D, E-set{0}->F, F-set{0}->G, G-set{1}->F, H-set{0}->E, H-set{0}->G, H-set{1}->H}; number of "
            "cycles: 4; gc = Graph {A-set{0}->B, B, C-set{0}->A, D-set{0}->B, D-set{0}->C, E-set{0}->D, E-set{0}->F, "
-           "F-set{0}->G, G, H-set{0}->E, H-set{0}->G}; ";
+           "F-set{0}->G, G, H-set{0}->E, H-set{0}->G}; graph2dag(g)    = Graph {Graph {A-set{0}->B, B-set{1}->C, "
+           "C-set{0}->A}, Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, "
+           "Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph {F-set{0}->G, "
+           "G-set{1}->F}, Graph {H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph "
+           "{H-set{1}->H}-set{0}->Graph {F-set{0}->G, G-set{1}->F}}; parallelize(h)  = std::vector{std::vector{Graph "
+           "{A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}, std::vector{Graph "
+           "{D-set{1}->E, E-set{0}->D}}, std::vector{Graph {H-set{1}->H}}}; ";
 }
 
 bool check6()
