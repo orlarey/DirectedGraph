@@ -1,4 +1,4 @@
-name: Ubuntu
+name: macOS
 
 on:
   push:
@@ -12,6 +12,8 @@ jobs:
     runs-on: macos-12
 
     steps:
+    - name: install dependencies
+      run: brew install fmenezes/tap/clang-tidy
     - uses: actions/checkout@v3
     - name: create cmake project
       run: cmake -B build -S .
