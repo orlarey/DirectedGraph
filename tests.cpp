@@ -297,6 +297,10 @@ void test6(std::ostream& ss)
     ss << "graph2dag(g)    = " << h << "; ";
     auto p = parallelize(h);  //
     ss << "parallelize(h)  = " << p << "; ";
+    auto rp = rparallelize(h);  //
+    ss << "rparallelize(h)  = " << rp << "; ";
+    auto s = serialize(h);  //
+    ss << "serialize(h)    = " << s << "; ";
 }
 
 std::string res6()
@@ -310,7 +314,11 @@ std::string res6()
            "G-set{1}->F}, Graph {H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph "
            "{H-set{1}->H}-set{0}->Graph {F-set{0}->G, G-set{1}->F}}; parallelize(h)  = std::vector{std::vector{Graph "
            "{A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}, std::vector{Graph "
-           "{D-set{1}->E, E-set{0}->D}}, std::vector{Graph {H-set{1}->H}}}; ";
+           "{D-set{1}->E, E-set{0}->D}}, std::vector{Graph {H-set{1}->H}}}; rparallelize(h)  = "
+           "std::vector{std::vector{Graph {H-set{1}->H}}, std::vector{Graph {D-set{1}->E, E-set{0}->D}}, "
+           "std::vector{Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}}; "
+           "serialize(h)    = std::vector{Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, "
+           "G-set{1}->F}, Graph {D-set{1}->E, E-set{0}->D}, Graph {H-set{1}->H}}; ";
 }
 
 bool check6()
