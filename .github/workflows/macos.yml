@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: create cmake project
-      run: cmake -B build -S .
+      run: cmake -DNOTIDY=ON -B build -S .
     - name: build cmake project
       run: cmake --build build/ --target all
     - name: execute test
