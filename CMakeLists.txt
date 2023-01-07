@@ -4,8 +4,11 @@ cmake_minimum_required(VERSION 3.10)
 project(test)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=-*,clang-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers,performance-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,llvm-*,modernize-*,-modernize-use-trailing-return-type,cert-*")
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if (TOTO)
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=-*,clang-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers,performance-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,llvm-*,modernize-*,-modernize-use-trailing-return-type,cert-*")
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
 
 if (MSVC)
     # warning level 4 and all warnings as errors
