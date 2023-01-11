@@ -29,9 +29,9 @@ int main(int, const char**)
     r &= check10();
     r &= check11();
     r &= check12();
+    r &= check13();
+    r &= check14();
     /*
-        r &= check13();
-        r &= check14();
         r &= check15();
     */
     return (r) ? 0 : 1;

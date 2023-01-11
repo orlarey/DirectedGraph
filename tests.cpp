@@ -622,13 +622,18 @@ void test13(std::ostream& ss)
     ss << "graph h   : " << h << std::endl;
     ss << "roots(h)  : " << roots(h) << std::endl;
     ss << "leafs(h)  : " << leaves(h) << std::endl;
-    ss << dfschedule(h) << ", cost: " << schedulingcost(h, dfschedule(h)) << std::endl;
-    ss << bfschedule(h) << ", cost: " << schedulingcost(h, bfschedule(h)) << std::endl;
+    ss << "DF" << dfschedule(h) << ", cost: " << schedulingcost(h, dfschedule(h)) << std::endl;
+    ss << "BF" << bfschedule(h) << ", cost: " << schedulingcost(h, bfschedule(h)) << std::endl;
 }
 
 std::string res13()
 {
-    return "";
+    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{0}->G, C-set{0}->D, D, E-set{0}->F, F-set{0}->G, "
+           "G-set{0}->H, H}\n"
+           "roots(h)  : std::vector{A, E}\n"
+           "leafs(h)  : std::vector{D, H}\n"
+           "DFSchedule {1:D, 2:C, 3:H, 4:G, 5:B, 6:A, 7:F, 8:E}, cost: 11\n"
+           "BFSchedule {1:D, 2:H, 3:C, 4:G, 5:B, 6:F, 7:A, 8:E}, cost: 13\n";
 }
 
 bool check13()
@@ -640,8 +645,8 @@ bool check13()
         std::cout << "test13 OK " << std::endl;
     } else {
         std::cout << "test13 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res13() << std::endl;
+        std::cout << "We got     " << '[' << ss.str() << ']' << std::endl;
+        std::cout << "instead of " << '[' << res13() << ']' << std::endl;
     }
     return ok;
 }
@@ -661,7 +666,9 @@ void test14(std::ostream& ss)
 
 std::string res14()
 {
-    return "";
+    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, D, E-set{0}->F, "
+           "F-set{0}->G, G-set{2}->F, G-set{0}->H, H}\n"
+           "Schedule {1:D, 2:H, 3:G, 4:F, 5:C, 6:B, 7:A, 8:E}, cost: 17\n";
 }
 
 bool check14()
