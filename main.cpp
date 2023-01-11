@@ -31,8 +31,6 @@ int main(int, const char**)
     r &= check12();
     r &= check13();
     r &= check14();
-    /*
-        r &= check15();
-    */
+    r &= check15();
     return (r) ? 0 : 1;
 }

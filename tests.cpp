@@ -705,7 +705,10 @@ void test15(std::ostream& ss)
 
 std::string res15()
 {
-    return "";
+    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, D-set{0}->U, "
+           "E-set{0}->F, F-set{0}->G, G-set{2}->F, G-set{0}->H, H, U-set{1}->D}\n"
+           "deep-first    : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:A, 9:E}, cost: 19\n"
+           "breadth-first : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:E, 9:A}, cost: 19\n";
 }
 
 bool check15()
