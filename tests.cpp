@@ -486,7 +486,10 @@ void test9(std::ostream& ss)
 
 std::string res9()
 {
-    return "";
+    return "Subgraph(Graph {A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, E-set{0}->D, "
+           "E-set{0}->F, F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}, set{H}) = Graph "
+           "{A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, E-set{0}->D, E-set{0}->F, "
+           "F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}";
 }
 
 bool check9()
@@ -556,7 +559,8 @@ void test11(std::ostream& ss)
 
 std::string res11()
 {
-    return "";
+    return "chain(Graph {A-set{0}->B, A-set{0}->I, B-set{3}->C, C-set{0}->D, D-set{0}->E, E, I-set{4}->J, "
+           "J-set{5}->E}, false) = Graph {A, B-set{3}->C, C-set{0}->D, D, E, I-set{4}->J, J}";
 }
 
 bool check11()
@@ -569,7 +573,7 @@ bool check11()
     } else {
         std::cout << "test11 FAIL " << std::endl;
         std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res9() << std::endl;
+        std::cout << "instead of " << res11() << std::endl;
     }
     return ok;
 }
@@ -588,7 +592,8 @@ void test12(std::ostream& ss)
 
 std::string res12()
 {
-    return "";
+    return "chain(Graph {A-set{0}->B, A-set{0}->I, B-set{3}->C, C-set{0}->D, D-set{0}->E, E, I-set{4}->J, "
+           "J-set{5}->E}, true) = Graph {B-set{3}->C, C-set{0}->D, D, I-set{4}->J, J}";
 }
 
 bool check12()

@@ -25,11 +25,11 @@ int main(int, const char**)
     r &= check6();
     // r &= check7();
     r &= check8();
+    r &= check9();
+    r &= check10();
+    r &= check11();
+    r &= check12();
     /*
-        r &= check9();
-        r &= check10();
-        r &= check11();
-        r &= check12();
         r &= check13();
         r &= check14();
         r &= check15();
