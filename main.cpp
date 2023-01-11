@@ -23,9 +23,9 @@ int main(int, const char**)
     r &= check4();
     r &= check5();
     r &= check6();
+    // r &= check7();
+    r &= check8();
     /*
-        r &= check7();
-        r &= check8();
         r &= check9();
         r &= check10();
         r &= check11();

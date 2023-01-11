@@ -442,7 +442,9 @@ void test8(std::ostream& ss)
 
 std::string res8()
 {
-    return "";
+    return "Subgraph(Graph {A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, E-set{0}->D, "
+           "E-set{0}->F, F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}, set{C, F}) = Graph "
+           "{A-set{0}->B, B-set{0}->C, C-set{0}->A, F-set{0}->G, G-set{0}->F}";
 }
 
 bool check8()
