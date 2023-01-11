@@ -282,7 +282,7 @@ inline std::vector<std::vector<N>> rparallelize(const digraph<N>& G)
 {
     std::vector<std::vector<N>> P = parallelize(G);
     int                         i = 0;
-    int                         j = P.size() - 1;
+    int                         j = int(P.size()) - 1;
 
     while (i < j) {
         swap(P[i], P[j]);
