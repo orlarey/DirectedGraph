@@ -58,7 +58,7 @@ class schedule
             std::cerr << "WARNING, already scheduled" << std::endl;
         } else {
             fElements.push_back(n);
-            fOrder[n] = fElements.size();
+            fOrder[n] = int(fElements.size());
         }
         return *this;
     }
