@@ -3,7 +3,7 @@
 
     digraph : directed graph
 
-    Copyright © 2022 Yann Orlarey. All rights reserved.
+    Copyright © 2023 Yann Orlarey. All rights reserved.
 
  *******************************************************************************
  ******************************************************************************/

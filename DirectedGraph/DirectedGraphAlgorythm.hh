@@ -3,8 +3,8 @@
 
     digraphop : a set of operations on directed graphs
 
-    Created by Yann Orlarey on 31/01/2017.
-    Copyright © 2017 Grame. All rights reserved.
+    Created by Yann Orlarey on 31/01/2022.
+    Copyright © 2023 Yann Orlarey. All rights reserved.
 
  *******************************************************************************
  ******************************************************************************/

@@ -2,8 +2,8 @@
 //  tests.hpp
 //  graphlib
 //
-//  Created by Yann Orlarey on 06/02/2017.
-//  Copyright © 2017 Yann Orlarey. All rights reserved.
+//  Created by Yann Orlarey on 06/02/2022.
+//  Copyright © 2023 Yann Orlarey. All rights reserved.
 //
 
 #pragma once
