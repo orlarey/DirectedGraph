@@ -39,7 +39,7 @@ class Tarjan
         int  fNum2    = 0;
     };
 
-    const digraph<N>&      fGraph;
+    const digraph<N>       fGraph;
     int                    fGroup;
     std::stack<N>          fStack;
     std::map<N, tarjanAux> fAux;
