@@ -32,5 +32,7 @@ int main(int, const char**)
     r &= check13();
     r &= check14();
     r &= check15();
+    r &= check16();
+
     return (r) ? 0 : 1;
 }

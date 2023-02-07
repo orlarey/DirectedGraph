@@ -725,3 +725,33 @@ bool check15()
     }
     return ok;
 }
+
+void test16(std::ostream& ss)
+{
+    digraph<char> g;
+    g.add('A', 'B', 0).add('A', 'B', 1).add('A', 'B', 2);
+
+    const std::set<int>& w = g.weights('A', 'B');
+
+    ss << "w = " << w << std::endl;
+}
+
+std::string res16()
+{
+    return "w = set{0, 1, 2}\n";
+}
+
+bool check16()
+{
+    std::stringstream ss;
+    test16(ss);
+    bool ok = (0 == ss.str().compare(res16()));
+    if (ok) {
+        std::cout << "test16 OK " << std::endl;
+    } else {
+        std::cout << "test16 FAIL " << std::endl;
+        std::cout << "We got     " << ss.str() << std::endl;
+        std::cout << "instead of " << res16() << std::endl;
+    }
+    return ok;
+}
