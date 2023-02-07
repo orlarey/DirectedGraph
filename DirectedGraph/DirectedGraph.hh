@@ -84,17 +84,80 @@ class digraph
             return fConnections.at(n);
         }
 
+        // Returns true is n1 and n2 are connected in the graph
+        [[nodiscard]] bool areConnected(const N& n1, const N& n2) const
+        {
+            // check we test connexions between existing nodes
+            assert(fNodes.find(n1) != fNodes.end());
+            assert(fNodes.find(n2) != fNodes.end());
+            auto cnx1 = fConnections.find(n1);
+            if (cnx1 == fConnections.end()) {
+                // n1 has no connection
+                return false;
+            } else {
+                auto cnx2 = cnx1->second.find(n2);
+                if (cnx2 == cnx1->second.end()) {
+                    // n1 has connections, but not to n2
+                    return false;
+                } else {
+                    // its seems we have connections between n1 and n2,
+                    // but we need to check
+                    const std::set<int>& w12 = cnx2->second;
+                    return !w12.empty();
+                }
+            }
+        }
+
+        // Returns the destinations of node n in the graph
+        [[nodiscard]] bool areConnected(const N& n1, const N& n2, int& d) const
+        {
+            // check we test connexions between existing nodes
+            assert(fNodes.find(n1) != fNodes.end());
+            assert(fNodes.find(n2) != fNodes.end());
+            auto cnx1 = fConnections.find(n1);
+            if (cnx1 == fConnections.end()) {
+                // n1 has no connection
+                return false;
+            } else {
+                auto cnx2 = cnx1->second.find(n2);
+                if (cnx2 == cnx1->second.end()) {
+                    // n1 has connections, but not to n2
+                    return false;
+                } else {
+                    // its seems we have connections between n1 and n2,
+                    // but we need to check
+                    const std::set<int>& w12 = cnx2->second;
+                    if (!w12.empty()) {
+                        d = *w12.begin();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
         // Returns the weights of the connections between two nodes
         [[nodiscard]] const TWeights& weights(const N& n1, const N& n2) const
         {
+            // check we test connexions between existing nodes
             assert(fNodes.find(n1) != fNodes.end());
             assert(fNodes.find(n2) != fNodes.end());
-            auto dst = fConnections.at(n1);
-            auto it  = dst.find(n2);
-            if (it == dst.end()) {
+            auto cnx1 = fConnections.find(n1);
+            if (cnx1 == fConnections.end()) {
+                // n1 has no connection
                 return gEmptyWeights;
             } else {
-                return it->second;
+                auto cnx2 = cnx1->second.find(n2);
+                if (cnx2 == cnx1->second.end()) {
+                    // n1 has connections, but not to n2
+                    return gEmptyWeights;
+                } else {
+                    // its seems we have connections between n1 and n2,
+                    // but we need to check
+                    const std::set<int>& w12 = cnx2->second;
+                    return w12;
+                }
             }
         }
     };
@@ -160,24 +223,11 @@ class digraph
     //--------------------------------------------------------------------------
 
     // true is there is any connection between nodes n1 and n2
-    [[nodiscard]] bool areConnected(const N& n1, const N& n2) const
-    {
-        const TWeights& w = weights(n1, n2);
-        return !w.empty();
-    }
+    [[nodiscard]] bool areConnected(const N& n1, const N& n2) const { return fContent->areConnected(n1, n2); }
 
     // true is there is any connection between nodes n1 and n2.
     // The smallest weight is returned in d.
-    bool areConnected(const N& n1, const N& n2, int& d) const
-    {
-        const TWeights& w = weights(n1, n2);
-        if (w.empty()) {
-            return false;
-        } else {
-            d = *w.begin();
-            return true;
-        }
-    }
+    bool areConnected(const N& n1, const N& n2, int& d) const { return fContent->areConnected(n1, n2, d); }
 
     //--------------------------------------------------------------------------
     // compare graphs for maps and other containers
