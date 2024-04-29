@@ -5,10 +5,11 @@
 //  Created by Yann Orlarey on 06/02/2022.
 //  Copyright © 2023 Yann Orlarey. All rights reserved.
 //
+#include <algorithm>
 
-#include "tests.hh"
 #include "DirectedGraph.hh"
 #include "DirectedGraphAlgorythm.hh"
+#include "tests.hh"
 
 void test0(std::ostream& ss)
 {
@@ -42,11 +43,11 @@ bool check0()
     test0(ss);
     bool ok = (0 == ss.str().compare(res0()));
     if (ok) {
-        std::cout << "test0 OK " << std::endl;
+        std::cout << "test0 OK " << '\n';
     } else {
-        std::cout << "test0 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res0() << std::endl;
+        std::cout << "test0 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res0() << '\n';
     }
     return ok;
 }
@@ -69,7 +70,7 @@ void test1(std::ostream& ss)
         .add('H', 'H');
 
     ss << "Tarjan partition of g = ";
-    Tarjan<char> tarj(g);
+    Tarjan tarj(g);
     for (const auto& cycle : tarj.partition()) {
         ss << "group{ ";
         for (const auto& n : cycle) {
@@ -90,11 +91,11 @@ bool check1()
     test1(ss);
     bool ok = (0 == ss.str().compare(res1()));
     if (ok) {
-        std::cout << "test1 OK " << std::endl;
+        std::cout << "test1 OK " << '\n';
     } else {
-        std::cout << "test1 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res1() << std::endl;
+        std::cout << "test1 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res1() << '\n';
     }
     return ok;
 }
@@ -134,11 +135,11 @@ bool check2()
     test2(ss);
     bool ok = (0 == ss.str().compare(res2()));
     if (ok) {
-        std::cout << "test2 OK " << std::endl;
+        std::cout << "test2 OK " << '\n';
     } else {
-        std::cout << "test2 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res2() << std::endl;
+        std::cout << "test2 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res2() << '\n';
     }
     return ok;
 }
@@ -162,8 +163,7 @@ void test3(std::ostream& ss)
 
     auto h1 = cut(g, 64);     // cut vectorsize connections
     auto h2 = graph2dag(h1);  // find cycles
-    auto h3 =
-        mapnodes<digraph<char>, digraph<char>>(h2, [](const digraph<char>& gr) -> digraph<char> { return cut(gr, 1); });
+    auto h3 = mapnodes<digraph<char>, digraph<char>>(h2, [](const digraph<char>& gr) { return cut(gr, 1); });
     ss << "test3: h3= " << h3;
 }
 
@@ -181,11 +181,11 @@ bool check3()
     test3(ss);
     bool ok = (0 == ss.str().compare(res3()));
     if (ok) {
-        std::cout << "test3 OK " << std::endl;
+        std::cout << "test3 OK " << '\n';
     } else {
-        std::cout << "test3 FAIL " << std::endl;
-        std::cout << "We got     \"" << ss.str() << '"' << std::endl;
-        std::cout << "instead of \"" << res3() << '"' << std::endl;
+        std::cout << "test3 FAIL " << '\n';
+        std::cout << "We got     \"" << ss.str() << '"' << '\n';
+        std::cout << "instead of \"" << res3() << '"' << '\n';
     }
     return ok;
 }
@@ -203,9 +203,9 @@ void test4(std::ostream& ss)
     g3.add(g1).add(g2);
 
     ss << "test4: g3.add(g1).add(g2) = " << g3;
-    // std::cout << "test4: g1= " << g1 << std::endl;
-    // std::cout << "test4: g2= " << g2 << std::endl;
-    // std::cout << "test4: g3= " << g3 << std::endl;
+    // std::cout << "test4: g1= " << g1 << '\n';
+    // std::cout << "test4: g2= " << g2 << '\n';
+    // std::cout << "test4: g3= " << g3 << '\n';
 }
 
 std::string res4()
@@ -220,11 +220,11 @@ bool check4()
     test4(ss);
     bool ok = (0 == ss.str().compare(res4()));
     if (ok) {
-        std::cout << "test4 OK " << std::endl;
+        std::cout << "test4 OK " << '\n';
     } else {
-        std::cout << "test4 FAIL " << std::endl;
-        std::cout << "We got     \"" << ss.str() << '"' << std::endl;
-        std::cout << "instead of \"" << res4() << '"' << std::endl;
+        std::cout << "test4 FAIL " << '\n';
+        std::cout << "We got     \"" << ss.str() << '"' << '\n';
+        std::cout << "instead of \"" << res4() << '"' << '\n';
     }
     return ok;
 }
@@ -263,11 +263,11 @@ bool check5()
     test5(ss);
     bool ok = (0 == ss.str().compare(res5()));
     if (ok) {
-        std::cout << "test5 OK " << std::endl;
+        std::cout << "test5 OK " << '\n';
     } else {
-        std::cout << "test5 FAIL " << std::endl;
-        std::cout << "We got     \"" << ss.str() << '"' << std::endl;
-        std::cout << "instead of \"" << res5() << '"' << std::endl;
+        std::cout << "test5 FAIL " << '\n';
+        std::cout << "We got     \"" << ss.str() << '"' << '\n';
+        std::cout << "instead of \"" << res5() << '"' << '\n';
     }
     return ok;
 }
@@ -327,11 +327,11 @@ bool check6()
     test6(ss);
     bool ok = (0 == ss.str().compare(res6()));
     if (ok) {
-        std::cout << "test6 OK " << std::endl;
+        std::cout << "test6 OK " << '\n';
     } else {
-        std::cout << "test6 FAIL " << std::endl;
-        std::cout << "We got     \"" << ss.str() << '"' << std::endl;
-        std::cout << "instead of \"" << res6() << '"' << std::endl;
+        std::cout << "test6 FAIL " << '\n';
+        std::cout << "We got     \"" << ss.str() << '"' << '\n';
+        std::cout << "instead of \"" << res6() << '"' << '\n';
     }
     return ok;
 }
@@ -358,8 +358,8 @@ void test7(std::ostream& ss)
     auto rp = rparallelize(h);  //
     auto s  = serialize(h);     //
 
-    ss << "test7:        g = " << g << ";" << std::endl;
-    ss << "number of cycles: " << cycles(g) << ";" << std::endl;
+    ss << "test7:        g = " << g << ";" << '\n';
+    ss << "number of cycles: " << cycles(g) << ";" << '\n';
 
     auto gc = cut(g, 1);
     ss << "0-cycles        : " << cycles(gc) << "; ";
@@ -409,11 +409,11 @@ bool check7()
     test7(ss);
     bool ok = (0 == ss.str().compare(res7()));
     if (ok) {
-        std::cout << "test7 OK " << std::endl;
+        std::cout << "test7 OK " << '\n';
     } else {
-        std::cout << "test7 FAIL " << std::endl;
-        std::cout << "We got     \"" << ss.str() << '"' << std::endl;
-        std::cout << "instead of \"" << res7() << '"' << std::endl;
+        std::cout << "test7 FAIL " << '\n';
+        std::cout << "We got     \"" << ss.str() << '"' << '\n';
+        std::cout << "instead of \"" << res7() << '"' << '\n';
     }
     return ok;
 }
@@ -453,11 +453,11 @@ bool check8()
     test8(ss);
     bool ok = (0 == ss.str().compare(res8()));
     if (ok) {
-        std::cout << "test8 OK " << std::endl;
+        std::cout << "test8 OK " << '\n';
     } else {
-        std::cout << "test8 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res8() << std::endl;
+        std::cout << "test8 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res8() << '\n';
     }
     return ok;
 }
@@ -498,11 +498,11 @@ bool check9()
     test9(ss);
     bool ok = (0 == ss.str().compare(res9()));
     if (ok) {
-        std::cout << "test9 OK " << std::endl;
+        std::cout << "test9 OK " << '\n';
     } else {
-        std::cout << "test9 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res9() << std::endl;
+        std::cout << "test9 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res9() << '\n';
     }
     return ok;
 }
@@ -513,10 +513,7 @@ bool equiv(const digraph<N>& g, const digraph<N>& h)
     if (g.nodes() != h.nodes()) {
         return false;
     }
-    for (const auto& n : g.nodes()) {
-        if (g.destinations(n) != h.destinations(n)) return false;
-    }
-    return true;
+    return std::ranges::all_of(g.nodes(), [g, h](const auto& n) { return g.destinations(n) == h.destinations(n); });
 }
 
 bool check10()
@@ -538,12 +535,12 @@ bool check10()
 
     digraph<char> r = reverse(reverse(g));
     if (equiv(g, r)) {
-        std::cout << "test10 OK " << std::endl;
+        std::cout << "test10 OK " << '\n';
         return true;
     }
-    std::cout << "test10 FAIL " << std::endl;
-    std::cout << "We got      " << r << std::endl;
-    std::cout << "Instead of  " << g << std::endl;
+    std::cout << "test10 FAIL " << '\n';
+    std::cout << "We got      " << r << '\n';
+    std::cout << "Instead of  " << g << '\n';
     return false;
 }
 
@@ -569,11 +566,11 @@ bool check11()
     test11(ss);
     bool ok = (0 == ss.str().compare(res11()));
     if (ok) {
-        std::cout << "test11 OK " << std::endl;
+        std::cout << "test11 OK " << '\n';
     } else {
-        std::cout << "test11 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res11() << std::endl;
+        std::cout << "test11 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res11() << '\n';
     }
     return ok;
 }
@@ -602,11 +599,11 @@ bool check12()
     test12(ss);
     bool ok = (0 == ss.str().compare(res12()));
     if (ok) {
-        std::cout << "test12 OK " << std::endl;
+        std::cout << "test12 OK " << '\n';
     } else {
-        std::cout << "test12 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res12() << std::endl;
+        std::cout << "test12 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res12() << '\n';
     }
     return ok;
 }
@@ -619,11 +616,11 @@ void test13(std::ostream& ss)
     h.add('A', 'B').add('B', 'C').add('C', 'D').add('B', 'G');
     h.add('E', 'F').add('F', 'G').add('G', 'H');  //.add('F', 'C');
 
-    ss << "graph h   : " << h << std::endl;
-    ss << "roots(h)  : " << roots(h) << std::endl;
-    ss << "leafs(h)  : " << leaves(h) << std::endl;
-    ss << "DF" << dfschedule(h) << ", cost: " << schedulingcost(h, dfschedule(h)) << std::endl;
-    ss << "BF" << bfschedule(h) << ", cost: " << schedulingcost(h, bfschedule(h)) << std::endl;
+    ss << "graph h   : " << h << '\n';
+    ss << "roots(h)  : " << roots(h) << '\n';
+    ss << "leafs(h)  : " << leaves(h) << '\n';
+    ss << "DF" << dfschedule(h) << ", cost: " << schedulingcost(h, dfschedule(h)) << '\n';
+    ss << "BF" << bfschedule(h) << ", cost: " << schedulingcost(h, bfschedule(h)) << '\n';
 }
 
 std::string res13()
@@ -642,11 +639,11 @@ bool check13()
     test13(ss);
     bool ok = (0 == ss.str().compare(res13()));
     if (ok) {
-        std::cout << "test13 OK " << std::endl;
+        std::cout << "test13 OK " << '\n';
     } else {
-        std::cout << "test13 FAIL " << std::endl;
-        std::cout << "We got     " << '[' << ss.str() << ']' << std::endl;
-        std::cout << "instead of " << '[' << res13() << ']' << std::endl;
+        std::cout << "test13 FAIL " << '\n';
+        std::cout << "We got     " << '[' << ss.str() << ']' << '\n';
+        std::cout << "instead of " << '[' << res13() << ']' << '\n';
     }
     return ok;
 }
@@ -660,8 +657,8 @@ void test14(std::ostream& ss)
     h.add('A', 'B').add('B', 'C').add('C', 'D').add('B', 'G', 1).add('C', 'B', 1);
     h.add('E', 'F').add('F', 'G').add('G', 'H').add('G', 'F', 2);
 
-    ss << "graph h   : " << h << std::endl;
-    ss << dfcyclesschedule(h) << ", cost: " << schedulingcost(h, dfcyclesschedule(h)) << std::endl;
+    ss << "graph h   : " << h << '\n';
+    ss << dfcyclesschedule(h) << ", cost: " << schedulingcost(h, dfcyclesschedule(h)) << '\n';
 }
 
 std::string res14()
@@ -677,11 +674,11 @@ bool check14()
     test14(ss);
     bool ok = (0 == ss.str().compare(res14()));
     if (ok) {
-        std::cout << "test14 OK " << std::endl;
+        std::cout << "test14 OK " << '\n';
     } else {
-        std::cout << "test14 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res14() << std::endl;
+        std::cout << "test14 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res14() << '\n';
     }
     return ok;
 }
@@ -696,11 +693,9 @@ void test15(std::ostream& ss)
     h.add('D', 'U').add('U', 'D', 1);
     h.add('E', 'F').add('F', 'G').add('G', 'H').add('G', 'F', 2);
 
-    ss << "graph h   : " << h << std::endl;
-    ss << "deep-first    : " << dfcyclesschedule(h) << ", cost: " << schedulingcost(h, dfcyclesschedule(h))
-       << std::endl;
-    ss << "breadth-first : " << bfcyclesschedule(h) << ", cost: " << schedulingcost(h, bfcyclesschedule(h))
-       << std::endl;
+    ss << "graph h   : " << h << '\n';
+    ss << "deep-first    : " << dfcyclesschedule(h) << ", cost: " << schedulingcost(h, dfcyclesschedule(h)) << '\n';
+    ss << "breadth-first : " << bfcyclesschedule(h) << ", cost: " << schedulingcost(h, bfcyclesschedule(h)) << '\n';
 }
 
 std::string res15()
@@ -717,11 +712,11 @@ bool check15()
     test15(ss);
     bool ok = (0 == ss.str().compare(res15()));
     if (ok) {
-        std::cout << "test15 OK " << std::endl;
+        std::cout << "test15 OK " << '\n';
     } else {
-        std::cout << "test15 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res15() << std::endl;
+        std::cout << "test15 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res15() << '\n';
     }
     return ok;
 }
@@ -733,7 +728,7 @@ void test16(std::ostream& ss)
 
     const std::set<int>& w = g.weights('A', 'B');
 
-    ss << "w = " << w << std::endl;
+    ss << "w = " << w << '\n';
 }
 
 std::string res16()
@@ -747,11 +742,87 @@ bool check16()
     test16(ss);
     bool ok = (0 == ss.str().compare(res16()));
     if (ok) {
-        std::cout << "test16 OK " << std::endl;
+        std::cout << "test16 OK " << '\n';
     } else {
-        std::cout << "test16 FAIL " << std::endl;
-        std::cout << "We got     " << ss.str() << std::endl;
-        std::cout << "instead of " << res16() << std::endl;
+        std::cout << "test16 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res16() << '\n';
+    }
+    return ok;
+}
+
+void test17(std::ostream& ss)
+{
+    digraph<char> g;
+    g.add('A', 'B')
+        .add('C', 'A')
+        .add('D', 'B')
+        .add('D', 'C')
+        .add('E', 'D')
+        .add('E', 'F')
+        .add('F', 'G')
+        .add('H', 'G')
+        .add('H', 'E');
+
+    ss << "topology of g = " << topology(g) << '\n';
+}
+
+std::string res17()
+{
+    return "topology of g = std::vector{8, 9, 0, 2, 2, 1, 1, 1, 1}\n";
+}
+
+bool check17()
+{
+    std::stringstream ss;
+    test17(ss);
+    bool ok = (0 == ss.str().compare(res17()));
+    if (ok) {
+        std::cout << "test17 OK " << '\n';
+    } else {
+        std::cout << "test17 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res17() << '\n';
+    }
+    return ok;
+}
+
+void test18(std::ostream& ss)
+{
+    digraph<char> g;
+    g.add('A', 'B')
+        .add('B', 'C', 1)
+        .add('C', 'A')
+        .add('D', 'B')
+        .add('D', 'C')
+        .add('D', 'E', 1)
+        .add('E', 'D')
+        .add('E', 'F')
+        .add('F', 'G')
+        .add('G', 'F', 1)
+        .add('H', 'G')
+        .add('H', 'E')
+        .add('H', 'H', 1);
+
+    ss << "topology of g = " << topology(g) << '\n';
+}
+
+std::string res18()
+{
+    return "topology of g = std::vector{8, 13, 4, 2, 1, 1}\n";
+}
+
+bool check18()
+{
+    std::stringstream ss;
+    test18(ss);
+    bool ok = (0 == ss.str().compare(res18()));
+    if (ok) {
+        std::cout << "test18 OK " << '\n';
+    } else {
+        std::cout << "test18 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res18() << '\n';
     }
     return ok;
 }

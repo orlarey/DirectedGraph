@@ -84,4 +84,12 @@ bool        check15();
 void        test16(std::ostream& ss);
 std::string res16();
 bool        check16();
+
+void        test17(std::ostream& ss);
+std::string res17();
+bool        check17();
+
+void        test18(std::ostream& ss);
+std::string res18();
+bool        check18();
 /**/
