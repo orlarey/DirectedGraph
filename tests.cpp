@@ -33,7 +33,8 @@ void test0(std::ostream& ss)
 
 std::string res0()
 {
-    return "g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{1}->E, E-set{0}->D, "
+    return "g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, "
+           "D-set{1}->E, E-set{0}->D, "
            "E-set{0}->F, F-set{0}->G, G-set{1}->F, H-set{0}->E, H-set{0}->G, H-set{1}->H}";
 }
 
@@ -123,9 +124,12 @@ void test2(std::ostream& ss)
 std::string res2()
 {
     return "dag of g = Graph {Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {D-set{1}->E, "
-           "E-set{0}->D}-set{0}->Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {D-set{1}->E, "
-           "E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph {F-set{0}->G, G-set{1}->F}, Graph "
-           "{H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph {H-set{1}->H}-set{0}->Graph {F-set{0}->G, "
+           "E-set{0}->D}-set{0}->Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph "
+           "{D-set{1}->E, "
+           "E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph {F-set{0}->G, "
+           "G-set{1}->F}, Graph "
+           "{H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph "
+           "{H-set{1}->H}-set{0}->Graph {F-set{0}->G, "
            "G-set{1}->F}}";
 }
 
@@ -163,15 +167,18 @@ void test3(std::ostream& ss)
 
     auto h1 = cut(g, 64);     // cut vectorsize connections
     auto h2 = graph2dag(h1);  // find cycles
-    auto h3 = mapnodes<digraph<char>, digraph<char>>(h2, [](const digraph<char>& gr) { return cut(gr, 1); });
+    auto h3 = mapnodes<digraph<char>, digraph<char>>(
+        h2, [](const digraph<char>& gr) { return cut(gr, 1); });
     ss << "test3: h3= " << h3;
 }
 
 std::string res3()
 {
-    return "test3: h3= Graph {Graph {A-set{0}->B, B, C-set{0}->A}, Graph {D, E-set{0}->D}-set{0}->Graph {A-set{0}->B, "
+    return "test3: h3= Graph {Graph {A-set{0}->B, B, C-set{0}->A}, Graph {D, "
+           "E-set{0}->D}-set{0}->Graph {A-set{0}->B, "
            "B, "
-           "C-set{0}->A}, Graph {D, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G}, Graph {F-set{0}->G, G}, Graph "
+           "C-set{0}->A}, Graph {D, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G}, Graph "
+           "{F-set{0}->G, G}, Graph "
            "{H}-set{0}->Graph {D, E-set{0}->D}, Graph {H}-set{0}->Graph {F-set{0}->G, G}}";
 }
 
@@ -210,7 +217,8 @@ void test4(std::ostream& ss)
 
 std::string res4()
 {
-    return "test4: g3.add(g1).add(g2) = Graph {A-set{2}->A, A-set{0, 2}->B, A-set{0}->C, A-set{1}->D, B-set{1}->B, C, "
+    return "test4: g3.add(g1).add(g2) = Graph {A-set{2}->A, A-set{0, 2}->B, A-set{0}->C, "
+           "A-set{1}->D, B-set{1}->B, C, "
            "D}";
 };
 
@@ -245,16 +253,17 @@ void test5(std::ostream& ss)
     g1.add('A', 'Z');
     g1.add('W', 'C', 1);
 
-    splitgraph<char>(
-        g1, [](const char& c) { return c < 'K'; }, g2, g3);
+    splitgraph<char>(g1, [](const char& c) { return c < 'K'; }, g2, g3);
 
     ss << "test5: g1 = " << g1 << "; g2 = " << g2 << "; g3 = " << g3;
 }
 
 std::string res5()
 {
-    return "test5: g1 = Graph {A-set{0}->B, A-set{0}->Z, B-set{0}->C, C-set{1}->A, W-set{1}->C, W-set{1}->Z, "
-           "Z-set{0}->W}; g2 = Graph {A-set{0}->B, B-set{0}->C, C-set{1}->A}; g3 = Graph {W-set{1}->Z, Z-set{0}->W}";
+    return "test5: g1 = Graph {A-set{0}->B, A-set{0}->Z, B-set{0}->C, C-set{1}->A, W-set{1}->C, "
+           "W-set{1}->Z, "
+           "Z-set{0}->W}; g2 = Graph {A-set{0}->B, B-set{0}->C, C-set{1}->A}; g3 = Graph "
+           "{W-set{1}->Z, Z-set{0}->W}";
 };
 
 bool check5()
@@ -305,19 +314,30 @@ void test6(std::ostream& ss)
 
 std::string res6()
 {
-    return "test6:        g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{1}->E, "
-           "E-set{0}->D, E-set{0}->F, F-set{0}->G, G-set{1}->F, H-set{0}->E, H-set{0}->G, H-set{1}->H}; number of "
-           "cycles: 4; gc = Graph {A-set{0}->B, B, C-set{0}->A, D-set{0}->B, D-set{0}->C, E-set{0}->D, E-set{0}->F, "
-           "F-set{0}->G, G, H-set{0}->E, H-set{0}->G}; graph2dag(g)    = Graph {Graph {A-set{0}->B, B-set{1}->C, "
-           "C-set{0}->A}, Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, "
-           "Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph {F-set{0}->G, "
+    return "test6:        g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, "
+           "D-set{0}->C, D-set{1}->E, "
+           "E-set{0}->D, E-set{0}->F, F-set{0}->G, G-set{1}->F, H-set{0}->E, H-set{0}->G, "
+           "H-set{1}->H}; number of "
+           "cycles: 4; gc = Graph {A-set{0}->B, B, C-set{0}->A, D-set{0}->B, D-set{0}->C, "
+           "E-set{0}->D, E-set{0}->F, "
+           "F-set{0}->G, G, H-set{0}->E, H-set{0}->G}; graph2dag(g)    = Graph {Graph "
+           "{A-set{0}->B, B-set{1}->C, "
+           "C-set{0}->A}, Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {A-set{0}->B, "
+           "B-set{1}->C, C-set{0}->A}, "
+           "Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph "
+           "{F-set{0}->G, "
            "G-set{1}->F}, Graph {H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph "
-           "{H-set{1}->H}-set{0}->Graph {F-set{0}->G, G-set{1}->F}}; parallelize(h)  = std::vector{std::vector{Graph "
-           "{A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}, std::vector{Graph "
+           "{H-set{1}->H}-set{0}->Graph {F-set{0}->G, G-set{1}->F}}; parallelize(h)  = "
+           "std::vector{std::vector{Graph "
+           "{A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}, "
+           "std::vector{Graph "
            "{D-set{1}->E, E-set{0}->D}}, std::vector{Graph {H-set{1}->H}}}; rparallelize(h)  = "
-           "std::vector{std::vector{Graph {H-set{1}->H}}, std::vector{Graph {D-set{1}->E, E-set{0}->D}}, "
-           "std::vector{Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}}; "
-           "serialize(h)    = std::vector{Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, "
+           "std::vector{std::vector{Graph {H-set{1}->H}}, std::vector{Graph {D-set{1}->E, "
+           "E-set{0}->D}}, "
+           "std::vector{Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph {F-set{0}->G, "
+           "G-set{1}->F}}}; "
+           "serialize(h)    = std::vector{Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph "
+           "{F-set{0}->G, "
            "G-set{1}->F}, Graph {D-set{1}->E, E-set{0}->D}, Graph {H-set{1}->H}}; ";
 }
 
@@ -373,31 +393,45 @@ void test7(std::ostream& ss)
 
 std::string res7()
 {
-    return "test7:        g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{1}->E, "
-           "E-set{0}->D, E-set{0}->F, F-set{0}->G, G-set{1}->F, H-set{0}->E, H-set{0}->G, H-set{1}->H}; number of "
-           "cycles: 4; 0-cycles        : 0; graph2dag(g)    = Graph {Graph {A-set{0}->B, B-set{1}->C, "
-           "C-set{0}->A}, "
-           "Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A}, Graph "
-           "{D-set{1}->E, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph {F-set{0}->G, G-set{1}->F}, "
-           "Graph {H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph {H-set{1}->H}-set{0}->Graph "
-           "{F-set{0}->G, G-set{1}->F}}; parallelize(h)  = std::vector{std::vector{Graph {A-set{0}->B, "
+    return "test7:        g = Graph {A-set{0}->B, B-set{1}->C, C-set{0}->A, D-set{0}->B, "
+           "D-set{0}->C, D-set{1}->E, "
+           "E-set{0}->D, E-set{0}->F, F-set{0}->G, G-set{1}->F, H-set{0}->E, H-set{0}->G, "
+           "H-set{1}->H}; number of "
+           "cycles: 4; 0-cycles        : 0; graph2dag(g)    = Graph {Graph {A-set{0}->B, "
            "B-set{1}->C, "
-           "C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}, std::vector{Graph {D-set{1}->E, E-set{0}->D}}, "
-           "std::vector{Graph {H-set{1}->H}}}; rparallelize(h)  = std::vector{std::vector{Graph {H-set{1}->H}}, "
-           "std::vector{Graph {D-set{1}->E, E-set{0}->D}}, std::vector{Graph {A-set{0}->B, B-set{1}->C, "
            "C-set{0}->A}, "
-           "Graph {F-set{0}->G, G-set{1}->F}}}; serialize(h)    = std::vector{Graph {A-set{0}->B, B-set{1}->C, "
-           "C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}, Graph {D-set{1}->E, E-set{0}->D}, Graph "
+           "Graph {D-set{1}->E, E-set{0}->D}-set{0}->Graph {A-set{0}->B, B-set{1}->C, "
+           "C-set{0}->A}, Graph "
+           "{D-set{1}->E, E-set{0}->D}-set{0}->Graph {F-set{0}->G, G-set{1}->F}, Graph "
+           "{F-set{0}->G, G-set{1}->F}, "
+           "Graph {H-set{1}->H}-set{0}->Graph {D-set{1}->E, E-set{0}->D}, Graph "
+           "{H-set{1}->H}-set{0}->Graph "
+           "{F-set{0}->G, G-set{1}->F}}; parallelize(h)  = std::vector{std::vector{Graph "
+           "{A-set{0}->B, "
+           "B-set{1}->C, "
+           "C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}}, std::vector{Graph {D-set{1}->E, "
+           "E-set{0}->D}}, "
+           "std::vector{Graph {H-set{1}->H}}}; rparallelize(h)  = std::vector{std::vector{Graph "
+           "{H-set{1}->H}}, "
+           "std::vector{Graph {D-set{1}->E, E-set{0}->D}}, std::vector{Graph {A-set{0}->B, "
+           "B-set{1}->C, "
+           "C-set{0}->A}, "
+           "Graph {F-set{0}->G, G-set{1}->F}}}; serialize(h)    = std::vector{Graph {A-set{0}->B, "
+           "B-set{1}->C, "
+           "C-set{0}->A}, Graph {F-set{0}->G, G-set{1}->F}, Graph {D-set{1}->E, E-set{0}->D}, "
+           "Graph "
            "{H-set{1}->H}}; "
            "digraph mygraph {\n        \"A\"->\"B\" [label=\"set{0}\"];\n        \"B\"->\"C\" "
            "[label=\"set{1}\"];\n    "
            " "
            " "
            "  "
-           "\"C\"->\"A\" [label=\"set{0}\"];\n        \"D\"->\"B\" [label=\"set{0}\"];\n        \"D\"->\"C\" "
+           "\"C\"->\"A\" [label=\"set{0}\"];\n        \"D\"->\"B\" [label=\"set{0}\"];\n        "
+           "\"D\"->\"C\" "
            "[label=\"set{0}\"];\n        \"D\"->\"E\" [label=\"set{1}\"];\n        \"E\"->\"D\" "
            "[label=\"set{0}\"];\n  "
-           "      \"E\"->\"F\" [label=\"set{0}\"];\n        \"F\"->\"G\" [label=\"set{0}\"];\n        \"G\"->\"F\" "
+           "      \"E\"->\"F\" [label=\"set{0}\"];\n        \"F\"->\"G\" [label=\"set{0}\"];\n     "
+           "   \"G\"->\"F\" "
            "[label=\"set{1}\"];\n        \"H\"->\"E\" [label=\"set{0}\"];\n        \"H\"->\"G\" "
            "[label=\"set{0}\"];\n  "
            "      \"H\"->\"H\" [label=\"set{1}\"];\n}\n";
@@ -442,8 +476,10 @@ void test8(std::ostream& ss)
 
 std::string res8()
 {
-    return "Subgraph(Graph {A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, E-set{0}->D, "
-           "E-set{0}->F, F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}, set{C, F}) = Graph "
+    return "Subgraph(Graph {A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, "
+           "D-set{0}->E, E-set{0}->D, "
+           "E-set{0}->F, F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}, set{C, "
+           "F}) = Graph "
            "{A-set{0}->B, B-set{0}->C, C-set{0}->A, F-set{0}->G, G-set{0}->F}";
 }
 
@@ -486,9 +522,12 @@ void test9(std::ostream& ss)
 
 std::string res9()
 {
-    return "Subgraph(Graph {A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, E-set{0}->D, "
-           "E-set{0}->F, F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}, set{H}) = Graph "
-           "{A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, E-set{0}->D, E-set{0}->F, "
+    return "Subgraph(Graph {A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, "
+           "D-set{0}->E, E-set{0}->D, "
+           "E-set{0}->F, F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}, set{H}) "
+           "= Graph "
+           "{A-set{0}->B, B-set{0}->C, C-set{0}->A, D-set{0}->B, D-set{0}->C, D-set{0}->E, "
+           "E-set{0}->D, E-set{0}->F, "
            "F-set{0}->G, G-set{0}->F, H-set{0}->E, H-set{0}->G, H-set{0}->H}";
 }
 
@@ -513,7 +552,8 @@ bool equiv(const digraph<N>& g, const digraph<N>& h)
     if (g.nodes() != h.nodes()) {
         return false;
     }
-    return std::ranges::all_of(g.nodes(), [g, h](const auto& n) { return g.destinations(n) == h.destinations(n); });
+    return std::ranges::all_of(
+        g.nodes(), [g, h](const auto& n) { return g.destinations(n) == h.destinations(n); });
 }
 
 bool check10()
@@ -556,7 +596,8 @@ void test11(std::ostream& ss)
 
 std::string res11()
 {
-    return "chain(Graph {A-set{0}->B, A-set{0}->I, B-set{3}->C, C-set{0}->D, D-set{0}->E, E, I-set{4}->J, "
+    return "chain(Graph {A-set{0}->B, A-set{0}->I, B-set{3}->C, C-set{0}->D, D-set{0}->E, E, "
+           "I-set{4}->J, "
            "J-set{5}->E}, false) = Graph {A, B-set{3}->C, C-set{0}->D, D, E, I-set{4}->J, J}";
 }
 
@@ -589,7 +630,8 @@ void test12(std::ostream& ss)
 
 std::string res12()
 {
-    return "chain(Graph {A-set{0}->B, A-set{0}->I, B-set{3}->C, C-set{0}->D, D-set{0}->E, E, I-set{4}->J, "
+    return "chain(Graph {A-set{0}->B, A-set{0}->I, B-set{3}->C, C-set{0}->D, D-set{0}->E, E, "
+           "I-set{4}->J, "
            "J-set{5}->E}, true) = Graph {B-set{3}->C, C-set{0}->D, D, I-set{4}->J, J}";
 }
 
@@ -625,7 +667,8 @@ void test13(std::ostream& ss)
 
 std::string res13()
 {
-    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{0}->G, C-set{0}->D, D, E-set{0}->F, F-set{0}->G, "
+    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{0}->G, C-set{0}->D, D, E-set{0}->F, "
+           "F-set{0}->G, "
            "G-set{0}->H, H}\n"
            "roots(h)  : std::vector{A, E}\n"
            "leafs(h)  : std::vector{D, H}\n"
@@ -663,7 +706,8 @@ void test14(std::ostream& ss)
 
 std::string res14()
 {
-    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, D, E-set{0}->F, "
+    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, D, "
+           "E-set{0}->F, "
            "F-set{0}->G, G-set{2}->F, G-set{0}->H, H}\n"
            "Schedule {1:D, 2:H, 3:G, 4:F, 5:C, 6:B, 7:A, 8:E}, cost: 17\n";
 }
@@ -694,13 +738,16 @@ void test15(std::ostream& ss)
     h.add('E', 'F').add('F', 'G').add('G', 'H').add('G', 'F', 2);
 
     ss << "graph h   : " << h << '\n';
-    ss << "deep-first    : " << dfcyclesschedule(h) << ", cost: " << schedulingcost(h, dfcyclesschedule(h)) << '\n';
-    ss << "breadth-first : " << bfcyclesschedule(h) << ", cost: " << schedulingcost(h, bfcyclesschedule(h)) << '\n';
+    ss << "deep-first    : " << dfcyclesschedule(h)
+       << ", cost: " << schedulingcost(h, dfcyclesschedule(h)) << '\n';
+    ss << "breadth-first : " << bfcyclesschedule(h)
+       << ", cost: " << schedulingcost(h, bfcyclesschedule(h)) << '\n';
 }
 
 std::string res15()
 {
-    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, D-set{0}->U, "
+    return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, "
+           "D-set{0}->U, "
            "E-set{0}->F, F-set{0}->G, G-set{2}->F, G-set{0}->H, H, U-set{1}->D}\n"
            "deep-first    : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:A, 9:E}, cost: 19\n"
            "breadth-first : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:E, 9:A}, cost: 19\n";
