@@ -92,4 +92,12 @@ bool        check17();
 void        test18(std::ostream& ss);
 std::string res18();
 bool        check18();
+
+void        test19(std::ostream& ss);
+std::string res19();
+bool        check19();
+
+void        test20(std::ostream& ss);
+std::string res20();
+bool        check20();
 /**/

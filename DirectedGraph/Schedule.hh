@@ -147,6 +147,29 @@ inline schedule<N> bfschedule(const digraph<N>& G)
 }
 
 /**
+ * @brief special schedule for a DAG
+ *
+ * @tparam N
+ * @param G
+ * @return schedule<N>
+ */
+template <typename N>
+inline schedule<N> spschedule(const digraph<N>& G)
+{
+    std::set<N> V;  // already scheduled nodes
+    schedule<N> S;  // the final schedule
+
+    std::list<N> L = recschedule(G);  // schedule list with duplicated
+    for (auto it = L.rbegin(); it != L.rend(); ++it) {
+        if (!V.contains(*it)) {
+            S.append(*it);
+            V.insert(*it);
+        }
+    }
+    return S;
+}
+
+/**
  * @brief The 'cost' of a scheduling. The scheduling time distance
  * between the nodes and its dependencies. This should be an indication
  * of how hot the cache is kept by this scheduling. The less the cost

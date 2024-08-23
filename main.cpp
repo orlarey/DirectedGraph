@@ -35,6 +35,12 @@ int main(int, const char**)
     r &= check16();
     r &= check17();
     r &= check18();
+    r &= check19();
+    r &= check20();
+
+    // test19(std::cout);
+
+    // test20(std::cout);
 
     return r ? 0 : 1;
 }

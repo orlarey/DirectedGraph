@@ -253,7 +253,8 @@ void test5(std::ostream& ss)
     g1.add('A', 'Z');
     g1.add('W', 'C', 1);
 
-    splitgraph<char>(g1, [](const char& c) { return c < 'K'; }, g2, g3);
+    splitgraph<char>(
+        g1, [](const char& c) { return c < 'K'; }, g2, g3);
 
     ss << "test5: g1 = " << g1 << "; g2 = " << g2 << "; g3 = " << g3;
 }
@@ -870,6 +871,85 @@ bool check18()
         std::cout << "test18 FAIL " << '\n';
         std::cout << "We got     " << ss.str() << '\n';
         std::cout << "instead of " << res18() << '\n';
+    }
+    return ok;
+}
+
+void test19(std::ostream& ss)
+{
+    digraph<char> g;
+    g.add('W', 'C').add('W', 'J').add('J', 'I').add('C', 'B').add('B', 'A');
+    ss << "critical path of g = " << criticalpath(g, 'W') << '\n';
+    ss << "superschedule of g = " << spschedule(g) << '\n';
+}
+
+std::string res19()
+{
+    return "critical path of g = std::vector{A, B, C, W}\n"
+           "superschedule of g = Schedule {1:A, 2:I, 3:B, 4:J, 5:C, 6:W}\n";
+}
+
+bool check19()
+{
+    std::stringstream ss;
+    test19(ss);
+    bool ok = (0 == ss.str().compare(res19()));
+    if (ok) {
+        std::cout << "test19 OK " << '\n';
+    } else {
+        std::cout << "test19 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res19() << '\n';
+    }
+    return ok;
+}
+
+void test20(std::ostream& ss)
+{
+    digraph<char> g;
+    g.add('Z', 'Y')
+        .add('Y', 'X')
+        .add('Y', 'J')
+        .add('X', 'W')
+        .add('W', 'C')
+        .add('W', 'J')
+        .add('J', 'I')
+        .add('C', 'B')
+        .add('B', 'A')
+        .add('Z', 'G')
+        .add('G', 'E')
+        .add('G', 'F');
+    ss << "critical path of g = " << criticalpath(g, 'Z') << '\n';
+    ss << "    deepfirst of g = " << dfschedule(g) << '\n';
+    ss << "breadth first of g = " << bfschedule(g) << '\n';
+    ss << "superschedule of g = " << spschedule(g) << '\n';
+}
+
+std::string res20()
+{
+    return "critical path of g = std::vector{A, B, C, W, X, Y, Z}\n"
+           "    deepfirst of g = Schedule {1:E, 2:F, 3:G, 4:I, 5:J, 6:A, 7:B, 8:C, 9:W, 10:X, "
+           "11:Y, "
+           "12:Z}\n"
+           "breadth first of g = Schedule {1:A, 2:E, 3:F, 4:I, 5:B, 6:G, 7:J, 8:C, 9:W, 10:X, "
+           "11:Y, "
+           "12:Z}\n"
+           "superschedule of g = Schedule {1:A, 2:I, 3:B, 4:J, 5:C, 6:W, 7:X, 8:F, 9:E, 10:Y, "
+           "11:G, "
+           "12:Z}\n";
+}
+
+bool check20()
+{
+    std::stringstream ss;
+    test20(ss);
+    bool ok = (0 == ss.str().compare(res20()));
+    if (ok) {
+        std::cout << "test20 OK " << '\n';
+    } else {
+        std::cout << "test20 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res20() << '\n';
     }
     return ok;
 }
