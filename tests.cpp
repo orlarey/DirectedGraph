@@ -673,8 +673,8 @@ std::string res13()
            "G-set{0}->H, H}\n"
            "roots(h)  : std::vector{A, E}\n"
            "leafs(h)  : std::vector{D, H}\n"
-           "DFSchedule {1:D, 2:C, 3:H, 4:G, 5:B, 6:A, 7:F, 8:E}, cost: 11\n"
-           "BFSchedule {1:D, 2:H, 3:C, 4:G, 5:B, 6:F, 7:A, 8:E}, cost: 13\n";
+           "DFSchedule {1:D, 2:C, 3:H, 4:G, 5:B, 6:A, 7:F, 8:E}, cost: 23\n"
+           "BFSchedule {1:D, 2:H, 3:C, 4:G, 5:B, 6:F, 7:A, 8:E}, cost: 25\n";
 }
 
 bool check13()
@@ -710,7 +710,7 @@ std::string res14()
     return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, D, "
            "E-set{0}->F, "
            "F-set{0}->G, G-set{2}->F, G-set{0}->H, H}\n"
-           "Schedule {1:D, 2:H, 3:G, 4:F, 5:C, 6:B, 7:A, 8:E}, cost: 17\n";
+           "Schedule {1:D, 2:H, 3:G, 4:F, 5:C, 6:B, 7:A, 8:E}, cost: 47\n";
 }
 
 bool check14()
@@ -750,8 +750,8 @@ std::string res15()
     return "graph h   : Graph {A-set{0}->B, B-set{0}->C, B-set{1}->G, C-set{1}->B, C-set{0}->D, "
            "D-set{0}->U, "
            "E-set{0}->F, F-set{0}->G, G-set{2}->F, G-set{0}->H, H, U-set{1}->D}\n"
-           "deep-first    : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:A, 9:E}, cost: 19\n"
-           "breadth-first : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:E, 9:A}, cost: 19\n";
+           "deep-first    : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:A, 9:E}, cost: 49\n"
+           "breadth-first : Schedule {1:U, 2:D, 3:H, 4:G, 5:F, 6:C, 7:B, 8:E, 9:A}, cost: 45\n";
 }
 
 bool check15()
@@ -907,36 +907,34 @@ bool check19()
 void test20(std::ostream& ss)
 {
     digraph<char> g;
-    g.add('Z', 'Y')
-        .add('Y', 'X')
-        .add('Y', 'J')
-        .add('X', 'W')
-        .add('W', 'C')
-        .add('W', 'J')
-        .add('J', 'I')
-        .add('C', 'B')
-        .add('B', 'A')
-        .add('Z', 'G')
-        .add('G', 'E')
-        .add('G', 'F');
+    g.add('Z', 'H').add('Z', 'X').add('Z', 'Y').add('Y', 'F').add('Y', 'G');
+    g.add('X', 'V').add('X', 'W').add('W', 'D').add('W', 'E').add('V', 'U').add('V', 'C');
+    g.add('U', 'A').add('U', 'B');
+
+    auto s1 = dfschedule(g);
+    auto s2 = bfschedule(g);
+    auto s3 = spschedule(g);
+    auto s4 = rbschedule(g);
+
     ss << "critical path of g = " << criticalpath(g, 'Z') << '\n';
-    ss << "    deepfirst of g = " << dfschedule(g) << '\n';
-    ss << "breadth first of g = " << bfschedule(g) << '\n';
-    ss << "superschedule of g = " << spschedule(g) << '\n';
+    ss << "    deepfirst of g = " << s1 << " cost:" << schedulingcost(g, s1) << '\n';
+    ss << "breadth first of g = " << s2 << " cost:" << schedulingcost(g, s2) << '\n';
+    ss << "superschedule of g = " << s3 << " cost:" << schedulingcost(g, s3) << '\n';
+    ss << "revbfschedule of g = " << s4 << " cost:" << schedulingcost(g, s4) << '\n';
 }
 
 std::string res20()
 {
-    return "critical path of g = std::vector{A, B, C, W, X, Y, Z}\n"
-           "    deepfirst of g = Schedule {1:E, 2:F, 3:G, 4:I, 5:J, 6:A, 7:B, 8:C, 9:W, 10:X, "
-           "11:Y, "
-           "12:Z}\n"
-           "breadth first of g = Schedule {1:A, 2:E, 3:F, 4:I, 5:B, 6:G, 7:J, 8:C, 9:W, 10:X, "
-           "11:Y, "
-           "12:Z}\n"
-           "superschedule of g = Schedule {1:A, 2:I, 3:B, 4:J, 5:C, 6:W, 7:X, 8:F, 9:E, 10:Y, "
-           "11:G, "
-           "12:Z}\n";
+    return "critical path of g = std::vector{A, U, V, X, Z}\n"
+           "    deepfirst of g = Schedule {1:H, 2:C, 3:A, 4:B, 5:U, 6:V, 7:D, 8:E, 9:W, 10:X, "
+           "11:F, "
+           "12:G, 13:Y, 14:Z} cost:235\n"
+           "breadth first of g = Schedule {1:A, 2:B, 3:C, 4:D, 5:E, 6:F, 7:G, 8:H, 9:U, 10:W, "
+           "11:Y, 12:V, 13:X, 14:Z} cost:361\n"
+           "superschedule of g = Schedule {1:B, 2:A, 3:E, 4:U, 5:D, 6:C, 7:W, 8:G, 9:V, 10:F, "
+           "11:X, 12:Y, 13:H, 14:Z} cost:121\n"
+           "revbfschedule of g = Schedule {1:B, 2:A, 3:U, 4:E, 5:D, 6:C, 7:W, 8:V, 9:G, 10:F, "
+           "11:Y, 12:X, 13:H, 14:Z} cost:107\n";
 }
 
 bool check20()

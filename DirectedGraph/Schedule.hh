@@ -12,11 +12,13 @@
  ******************************************************************************/
 
 #pragma once
+#include <algorithm>  // for std::find
 #include <cassert>
 #include <functional>
 #include <iostream>
 #include <list>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -69,6 +71,16 @@ class schedule {
             append(n);
         }
         return *this;
+    }
+
+    // A schedule in reverse order
+    schedule reverse() const
+    {
+        schedule<N> S;
+        for (auto it = fElements.rbegin(); it != fElements.rend(); ++it) {
+            S.append(*it);
+        }
+        return S;
     }
 };
 
@@ -189,7 +201,7 @@ inline int schedulingcost(const digraph<N>& G, const schedule<N>& S)
         for (const auto& c : G.destinations(n)) {
             int t0 = S.order(c.first);
             // assert(t1 > t0);
-            cost += std::abs(t1 - t0);  // We may have loops
+            cost += (t1 - t0) * (t1 - t0);  // We may have loops
         }
     }
     return cost;
@@ -231,4 +243,25 @@ inline schedule<N> bfcyclesschedule(const digraph<N>& G)
         S.append(dfschedule(cut(n, 1)));
     }
     return S;
+}
+
+/**
+ * @brief reverse breadth first schedule for a DAG
+ *
+ * @tparam N
+ * @param G
+ * @return schedule<N>
+ */
+template <typename N>
+inline schedule<N> rbschedule(const digraph<N>& G)
+{
+    std::vector<std::vector<N>> P = parallelize(reverse(G));
+    schedule<N>                 S;
+
+    for (uint64_t i = 0; i < P.size(); i++) {
+        for (const N& n : P[i]) {
+            S.append(n);
+        }
+    }
+    return S.reverse();
 }
