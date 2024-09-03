@@ -193,13 +193,13 @@ inline schedule<N> spschedule(const digraph<N>& G)
  * @return int
  */
 template <typename N>
-inline int schedulingcost(const digraph<N>& G, const schedule<N>& S)
+inline unsigned int schedulingcost(const digraph<N>& G, const schedule<N>& S)
 {
-    int cost = 0;
+    unsigned int cost = 0;
     for (const N& n : G.nodes()) {
-        int t1 = S.order(n);
+        unsigned int t1 = S.order(n);
         for (const auto& c : G.destinations(n)) {
-            int t0 = S.order(c.first);
+            unsigned int t0 = S.order(c.first);
             // assert(t1 > t0);
             cost += (t1 - t0) * (t1 - t0);  // We may have loops
         }
