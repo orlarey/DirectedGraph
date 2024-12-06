@@ -5,8 +5,9 @@ project(test)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address -fsanitize-address-use-after-return=always -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize-address-use-after-scope -fvisibility=hidden -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-overloaded-virtual -Wshadow")
+#set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address -fsanitize-address-use-after-return=always -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize-address-use-after-scope -fvisibility=hidden -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-overloaded-virtual -Wshadow")
 
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fvisibility=hidden -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-overloaded-virtual -Wshadow")
 
 if (NOTIDY)
 else ()
