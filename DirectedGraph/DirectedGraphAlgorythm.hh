@@ -98,7 +98,7 @@ class Tarjan {
     explicit Tarjan(const digraph<N>& g) : fGraph(g)
     {
         for (const auto& n : fGraph.nodes()) {
-            if (!fAux.contains(n)) {
+            if (fAux.find(n) == fAux.end()) {
                 visit(n);
             }
         }
@@ -125,7 +125,7 @@ inline int cycles(const digraph<N>& g)
 
 //===========================================================
 //===========================================================
-// graph2dag : transfoms a graph into a dag of supernodes,
+// graph2dag : transforms a graph into a dag of supernodes,
 // ie strongly connected components. The connection value
 // between two supernodes A and B is the smallest value of all
 // the destinations between nodes of A and nodes of B.
@@ -175,7 +175,7 @@ inline digraph<digraph<N>> graph2dag(const digraph<N>& g)
 
 //===========================================================
 //===========================================================
-// graph2dag2 : transfoms a graph into a dag of supernodes,
+// graph2dag2 : transforms a graph into a dag of supernodes,
 // ie strongly connected components. The connection value
 // between two supernodes A and B is the number of existing
 // destinations between nodes of A and nodes of B.
@@ -231,7 +231,7 @@ inline digraph<digraph<N>> graph2dag2(const digraph<N>& g)
 //===========================================================
 //===========================================================
 //
-// parallelize : transfoms a DAG into a sequential std::vector
+// parallelize : transforms a DAG into a sequential std::vector
 // of parallel vectors of nodes using a topological sort.
 //
 //===========================================================
@@ -295,7 +295,7 @@ inline std::vector<std::vector<N>> rparallelize(const digraph<N>& G)
 
 //===========================================================
 //===========================================================
-// serialize : transfoms a DAG into a sequence of nodes
+// serialize : transforms a DAG into a sequence of nodes
 // using a topological sort.
 //===========================================================
 //===========================================================
@@ -313,7 +313,7 @@ inline std::vector<N> serialize(const digraph<N>& G)
     using Visitfun =
         std::function<void(const digraph<N>&, const N&, std::set<N>&, std::vector<N>&)>;
     Visitfun visit = [&visit](const digraph<N>& g, const N& n, std::set<N>& V, std::vector<N>& S) {
-        if (!V.contains(n)) {
+        if (V.find(n) == V.end()) {
             V.insert(n);
             for (const auto& p : g.destinations(n)) {
                 visit(g, p.first, V, S);
@@ -332,7 +332,7 @@ inline std::vector<N> serialize(const digraph<N>& G)
 
 //===========================================================
 //===========================================================
-// std::mapgraph(foo) : transfoms a graph  by applying foo:N->M
+// std::mapgraph(foo) : transforms a graph by applying foo:N->M
 // to each node of graph. The destinations are preserved.
 //===========================================================
 //===========================================================
@@ -383,7 +383,7 @@ inline digraph<N> reverse(const digraph<N>& g)
 #if 0
 //===========================================================
 //===========================================================
-// mapconnections(g, keep) -> g' : transfoms a graph by
+// mapconnections(g, keep) -> g' : transforms a graph by
 // applying the std::function keep to each connection. If keep
 // returns true the connection is maintained, otherwise it
 // is removed.
@@ -824,7 +824,7 @@ inline std::ostream& operator<<(std::ostream& file, const digraph<N>& g)
 //===========================================================
 //
 // topology : high level description of a graph as a vector
-// of intergers.
+// of integers.
 //
 //===========================================================
 //===========================================================
