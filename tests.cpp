@@ -553,8 +553,8 @@ bool equiv(const digraph<N>& g, const digraph<N>& h)
     if (g.nodes() != h.nodes()) {
         return false;
     }
-    return std::ranges::all_of(
-        g.nodes(), [g, h](const auto& n) { return g.destinations(n) == h.destinations(n); });
+    return std::all_of(
+        g.nodes().begin(), g.nodes().end(), [g, h](const auto& n) { return g.destinations(n) == h.destinations(n); });
 }
 
 bool check10()
