@@ -28,4 +28,7 @@ include_directories(DirectedGraph)
 
 add_executable(test main.cpp tests.cpp tests.hh DirectedGraph/Schedule.hh DirectedGraph/DirectedGraph.hh DirectedGraph/DirectedGraphAlgorythm.hh)
 
+# add the benchmark executable
+add_executable(benchmark benchmark.cpp DirectedGraph/Schedule.hh DirectedGraph/DirectedGraph.hh DirectedGraph/DirectedGraphAlgorythm.hh)
+
 

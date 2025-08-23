@@ -324,6 +324,9 @@ inline std::vector<N> serialize(const digraph<N>& G)
 
     std::vector<N> S;
     std::set<N>    V;
+
+    S.reserve(G.nodes().size());
+
     for (const N& n : G.nodes()) {
         visit(G, n, V, S);
     }
@@ -370,10 +373,14 @@ template <typename N>
 inline digraph<N> reverse(const digraph<N>& g)
 {
     digraph<N> r;
-    // copy the destinations
+
     for (const auto& n : g.nodes()) {
         r.add(n);
+    }
+
+    for (const auto& n : g.nodes()) {
         for (const auto& cnx : g.destinations(n)) {
+            // Reverse connection: cnx.first -> n becomes n -> cnx.first
             r.add(cnx.first, n, cnx.second);
         }
     }
