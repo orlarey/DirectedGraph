@@ -1,12 +1,12 @@
-/*******************************************************************************
-********************************************************************************
+/*
+ * Copyright (c) 2023-2025, Yann Orlarey
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 
+/*******************************************************************************
     benchmark : Performance benchmarking for DirectedGraph library
 
     Created for performance analysis and optimization validation.
-    Copyright © 2023 DirectedGraph Library. All rights reserved.
-
- *******************************************************************************
  ******************************************************************************/
 
 #include <chrono>

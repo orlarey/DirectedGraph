@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 2022-2025, Yann Orlarey
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 //
 //  main.cpp
 //  graphlib
 //
 //  Created by Yann Orlarey on 31/01/2022.
-//  Copyright © 2023 Yann Orlarey. All rights reserved.
 //
 
 #include <iostream>

@@ -1,12 +1,12 @@
+/*
+ * Copyright (c) 2022-2025, Yann Orlarey
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 /*******************************************************************************
-********************************************************************************
+    DirectedGraphAlgorythm.hh
 
-    digraphop : a set of operations on directed graphs
-
-    Created by Yann Orlarey on 31/01/2022.
-    Copyright © 2023 Yann Orlarey. All rights reserved.
-
- *******************************************************************************
+    A set of operations on directed graphs
  ******************************************************************************/
 
 #pragma once
