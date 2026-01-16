@@ -550,6 +550,44 @@ inline digraph<N> chain(const digraph<N>& g, bool strict)
     return r;
 }
 
+/**
+ * @brief Compute in-degree and out-degree for all nodes in a graph
+ *
+ * @tparam N the type of nodes
+ * @param G the graph
+ * @return std::map<N, std::pair<int, int>> where each node maps to (in-degree, out-degree)
+ *
+ * The in-degree is the number of incoming edges to a node.
+ * The out-degree is the number of outgoing edges from a node.
+ *
+ * Example:
+ *   auto deg = degrees(G);
+ *   auto [in, out] = deg[node];  // C++17 structured binding
+ *   // or:
+ *   int in_deg = deg[node].first;
+ *   int out_deg = deg[node].second;
+ */
+template <typename N>
+inline std::map<N, std::pair<int, int>> degrees(const digraph<N>& G)
+{
+    std::map<N, std::pair<int, int>> deg;
+
+    // Initialize all nodes with (0, 0)
+    for (const N& n : G.nodes()) {
+        deg[n] = {0, 0};
+    }
+
+    // Count degrees by iterating over all edges
+    for (const N& n : G.nodes()) {
+        for (const auto& dest : G.destinations(n)) {
+            deg[n].second++;           // increment out-degree of n
+            deg[dest.first].first++;   // increment in-degree of destination
+        }
+    }
+
+    return deg;
+}
+
 template <typename N>
 inline std::vector<N> roots(const digraph<N>& G)
 {

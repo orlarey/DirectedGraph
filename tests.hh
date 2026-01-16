@@ -104,4 +104,8 @@ bool        check19();
 void        test20(std::ostream& ss);
 std::string res20();
 bool        check20();
+
+void        test21(std::ostream& ss);
+std::string res21();
+bool        check21();
 /**/

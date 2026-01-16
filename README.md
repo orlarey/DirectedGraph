@@ -43,6 +43,7 @@ The `Tarjan` class partitions a graph into strongly connected components.
 - `subgraph(const digraph<N>& G, const std::set<N>& S)`: Extracts a subgraph of `G` according to a set of nodes `S`.
 - `cut(const digraph<N>& G, int dm)`: Cuts all the connections of a graph with weight >= `dm`.
 - `chain(const digraph<N>& g, bool strict)`: Keeps only the chain connections of a graph.
+- `degrees(const digraph<N>& G)`: Returns a map of all nodes to their (in-degree, out-degree) pair.
 - `roots(const digraph<N>& G)`: Returns the roots of a graph.
 - `leaves(const digraph<N>& G)`: Returns the leaves of a graph.
 - `criticalpath(const digraph<N>& G, const N& n)`: Computes the critical path of a graph.

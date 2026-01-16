@@ -955,3 +955,45 @@ bool check20()
     }
     return ok;
 }
+
+void test21(std::ostream& ss)
+{
+    // Create a simple DAG:
+    //     A -> B -> D
+    //     |    ^
+    //     +--> C
+    digraph<char> g;
+    g.add('A', 'B').add('A', 'C').add('B', 'D').add('C', 'B');
+
+    auto deg = degrees(g);
+
+    ss << "degrees test:\n";
+    for (const auto& node : g.nodes()) {
+        auto [in, out] = deg[node];
+        ss << "  " << node << ": in=" << in << ", out=" << out << '\n';
+    }
+}
+
+std::string res21()
+{
+    return "degrees test:\n"
+           "  A: in=0, out=2\n"
+           "  B: in=2, out=1\n"
+           "  C: in=1, out=1\n"
+           "  D: in=1, out=0\n";
+}
+
+bool check21()
+{
+    std::stringstream ss;
+    test21(ss);
+    bool ok = (0 == ss.str().compare(res21()));
+    if (ok) {
+        std::cout << "test21 OK " << '\n';
+    } else {
+        std::cout << "test21 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res21() << '\n';
+    }
+    return ok;
+}
