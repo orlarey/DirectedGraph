@@ -47,6 +47,7 @@ The `Tarjan` class partitions a graph into strongly connected components.
 - `roots(const digraph<N>& G)`: Returns the roots of a graph.
 - `leaves(const digraph<N>& G)`: Returns the leaves of a graph.
 - `criticalpath(const digraph<N>& G, const N& n)`: Computes the critical path of a graph.
+- `allcriticalpaths(const digraph<N>& G)`: Returns all paths of maximum length in a DAG.
 - `interleave(std::list<N>& list1, std::list<N>& list2)`: Interleaves two lists.
 - `recschedulenode(const digraph<N>& G, const N& n)`: Recursive scheduling of a node of a DAG.
 - `recschedule(const digraph<N>& G)`: Recursive scheduling of the roots of a DAG.

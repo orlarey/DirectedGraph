@@ -108,4 +108,8 @@ bool        check20();
 void        test21(std::ostream& ss);
 std::string res21();
 bool        check21();
+
+void        test22(std::ostream& ss);
+std::string res22();
+bool        check22();
 /**/

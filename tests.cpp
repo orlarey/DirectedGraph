@@ -997,3 +997,48 @@ bool check21()
     }
     return ok;
 }
+
+void test22(std::ostream& ss)
+{
+    // Create a DAG with multiple critical paths:
+    //     A -> B -> D -> F
+    //     A -> C -> D -> F
+    //     A -> C -> E -> F
+    digraph<char> g;
+    g.add('A', 'B').add('A', 'C').add('B', 'D').add('C', 'D').add('C', 'E').add('D', 'F').add('E', 'F');
+
+    auto paths = allcriticalpaths(g);
+
+    ss << "All critical paths:\n";
+    for (const auto& path : paths) {
+        ss << "  ";
+        for (size_t i = 0; i < path.size(); ++i) {
+            if (i > 0) ss << " -> ";
+            ss << path[i];
+        }
+        ss << '\n';
+    }
+}
+
+std::string res22()
+{
+    return "All critical paths:\n"
+           "  A -> B -> D -> F\n"
+           "  A -> C -> D -> F\n"
+           "  A -> C -> E -> F\n";
+}
+
+bool check22()
+{
+    std::stringstream ss;
+    test22(ss);
+    bool ok = (0 == ss.str().compare(res22()));
+    if (ok) {
+        std::cout << "test22 OK " << '\n';
+    } else {
+        std::cout << "test22 FAIL " << '\n';
+        std::cout << "We got     " << ss.str() << '\n';
+        std::cout << "instead of " << res22() << '\n';
+    }
+    return ok;
+}
