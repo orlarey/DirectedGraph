@@ -8,7 +8,7 @@
 
     A schedule is an ordered set of nodes of some directed graph.
     It capture the idea of computing the graph in a certain order that preserves
-    the dependecies.
+    the dependencies.
 
  ******************************************************************************/
 
