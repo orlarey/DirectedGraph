@@ -35,3 +35,6 @@
 *.dSYM
 .DS_Store
 build
+
+# Benchmarks
+*-benchmark-results.txt
