@@ -15,6 +15,153 @@
 #include "DirectedGraphAlgorythm.hh"
 #include "tests.hh"
 
+// Validate the scheduling contract directly so tests do not depend on the
+// textual representation or on a particular valid topological order.
+template <typename N>
+static bool isValidSchedule(const digraph<N>& graph, const schedule<N>& result)
+{
+    if (result.size() != graph.nodes().size()) {
+        return false;
+    }
+    for (const N& source : graph.nodes()) {
+        if (result.order(source) == 0) {
+            return false;
+        }
+        for (const auto& destination : graph.destinations(source)) {
+            if (result.order(source) <= result.order(destination.first)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// A serialization is valid when every node appears exactly once and every
+// dependency is emitted before the node that depends on it.
+template <typename N>
+static bool isValidSerialization(const digraph<N>& graph, const std::vector<N>& result)
+{
+    if (result.size() != graph.nodes().size()) {
+        return false;
+    }
+
+    std::map<N, size_t> position;
+    size_t              index = 0;
+    for (const N& node : result) {
+        if (!position.emplace(node, index++).second) {
+            return false;
+        }
+    }
+    for (const N& source : graph.nodes()) {
+        if (position.find(source) == position.end()) {
+            return false;
+        }
+        for (const auto& destination : graph.destinations(source)) {
+            if (position.at(source) <= position.at(destination.first)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Parallel levels follow the same dependency order as schedules, while each
+// graph node must occur in one and only one level.
+template <typename N>
+static bool isValidParallelization(const digraph<N>&                  graph,
+                                   const std::vector<std::vector<N>>& levels)
+{
+    std::map<N, size_t> levelOf;
+    size_t              level = 0;
+    for (const auto& nodes : levels) {
+        for (const N& node : nodes) {
+            if (!levelOf.emplace(node, level).second) {
+                return false;
+            }
+        }
+        ++level;
+    }
+    if (levelOf.size() != graph.nodes().size()) {
+        return false;
+    }
+    for (const N& source : graph.nodes()) {
+        if (levelOf.find(source) == levelOf.end()) {
+            return false;
+        }
+        for (const auto& destination : graph.destinations(source)) {
+            if (levelOf.at(source) <= levelOf.at(destination.first)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Enumerate every root-to-leaf path as a small independent oracle for
+// allcriticalpaths; this intentionally uses no distance logic from the library.
+template <typename N>
+static std::vector<std::vector<N>> referenceCriticalPaths(const digraph<N>& graph)
+{
+    std::vector<std::vector<N>> paths;
+    std::vector<N>              path;
+
+    std::function<void(const N&)> visit = [&](const N& node) {
+        path.push_back(node);
+        if (graph.destinations(node).empty()) {
+            paths.push_back(path);
+        } else {
+            for (const auto& destination : graph.destinations(node)) {
+                visit(destination.first);
+            }
+        }
+        path.pop_back();
+    };
+
+    for (const N& root : roots(graph)) {
+        visit(root);
+    }
+    if (paths.empty()) {
+        return {};
+    }
+
+    const auto longest =
+        std::max_element(paths.begin(), paths.end(), [](const auto& lhs, const auto& rhs) {
+            return lhs.size() < rhs.size();
+        })->size();
+    paths.erase(
+        std::remove_if(paths.begin(), paths.end(),
+                       [longest](const auto& candidate) { return candidate.size() != longest; }),
+        paths.end());
+    std::sort(paths.begin(), paths.end());
+    return paths;
+}
+
+// Generate every possible DAG whose node order is 0..nodeCount-1. Restricting
+// edges to increasing node numbers makes acyclicity independent of the mask.
+static digraph<int> makeOrderedDag(unsigned int mask, int nodeCount)
+{
+    digraph<int> graph;
+    for (int node = 0; node < nodeCount; ++node) {
+        graph.add(node);
+    }
+
+    unsigned int edgeBit = 0;
+    for (int source = 0; source < nodeCount; ++source) {
+        for (int destination = source + 1; destination < nodeCount; ++destination, ++edgeBit) {
+            if ((mask & (1U << edgeBit)) != 0U) {
+                graph.add(source, destination);
+            }
+        }
+    }
+    return graph;
+}
+
+static bool reportCheck(int number, bool ok)
+{
+    std::cout << "test" << number << (ok ? " OK " : " FAIL ") << '\n';
+    return ok;
+}
+
 void test0(std::ostream& ss)
 {
     digraph<char> g;
@@ -445,16 +592,19 @@ std::string res7()
 bool check7()
 {
     std::stringstream ss;
-    test7(ss);
-    bool ok = (0 == ss.str().compare(res7()));
-    if (ok) {
-        std::cout << "test7 OK " << '\n';
-    } else {
-        std::cout << "test7 FAIL " << '\n';
-        std::cout << "We got     \"" << ss.str() << '"' << '\n';
-        std::cout << "instead of \"" << res7() << '"' << '\n';
-    }
-    return ok;
+    digraph<char>     g;
+    g.add('A', 'B', 2).add('B', 'A', 3).add('C');
+    dotfile(ss, g, true);
+
+    // Check semantic fragments instead of whitespace so formatting changes do
+    // not disable coverage of edges, isolated nodes, and SCC clusters.
+    const std::string output = ss.str();
+    const bool ok = output.find(R"dot("A"->"B" [label="set{2}"];)dot") != std::string::npos &&
+                    output.find(R"dot("B"->"A" [label="set{3}"];)dot") != std::string::npos &&
+                    output.find("\"C\";") != std::string::npos &&
+                    output.find("subgraph cluster") != std::string::npos && output.size() >= 2 &&
+                    output.rfind("}\n") == output.size() - 2;
+    return reportCheck(7, ok);
 }
 
 void test8(std::ostream& ss)
@@ -1041,4 +1191,99 @@ bool check22()
         std::cout << "instead of " << res22() << '\n';
     }
     return ok;
+}
+
+bool check23()
+{
+    digraph<std::string> original;
+    original.add("alpha");
+
+    auto copy = original;
+    copy.add("beta");
+
+    digraph<std::string> assigned;
+    assigned.add("discarded");
+    assigned = original;
+    assigned.add("beta", "gamma");
+
+    // Exercise Tarjan with a non-trivial node type to guard the lifetime of
+    // values removed from its internal stack.
+    digraph<std::string> cyclic;
+    cyclic.add("alpha", "beta").add("beta", "gamma").add("gamma", "alpha");
+    Tarjan<std::string> tarjan(cyclic);
+
+    const bool aliasesShareMutations =
+        original.nodes().count("beta") == 1 && original.nodes().count("gamma") == 1 &&
+        original.areConnected("beta", "gamma") && assigned.nodes().count("discarded") == 0;
+    const bool tarjanSupportsNonTrivialNodes = tarjan.cycles() == 1 &&
+                                               tarjan.partition().size() == 1 &&
+                                               tarjan.partition().begin()->size() == 3;
+    return reportCheck(23, aliasesShareMutations && tarjanSupportsNonTrivialNodes);
+}
+
+bool check24()
+{
+    digraph<int> empty;
+    digraph<int> graph;
+    graph.add(1).add(2).add(3);
+    graph.add(1, 2, 4).add(1, 2, -2).add(1, 2, 4);
+
+    int        smallestWeight = 0;
+    const bool basicQueries   = empty.nodes().empty() && graph.areConnected(1, 2, smallestWeight) &&
+                                smallestWeight == -2 && !graph.areConnected(2, 1) &&
+                                graph.weights(1, 3).empty() && graph.weights(2, 3).empty() &&
+                                graph.weights(1, 2) == std::set<int>({-2, 4});
+
+    digraph<int> singleton;
+    singleton.add(1);
+    digraph<int> selfLoop;
+    selfLoop.add(1, 1);
+
+    // graph2dag2 stores the number of original inter-component edges as the
+    // weight of the corresponding condensation edge.
+    digraph<int> counted;
+    counted.add(1, 2).add(2, 1).add(1, 3).add(2, 3);
+    auto condensation    = graph2dag2(counted);
+    bool countedTwoEdges = false;
+    for (const auto& component : condensation.nodes()) {
+        for (const auto& destination : condensation.destinations(component)) {
+            countedTwoEdges = destination.second == std::set<int>({2});
+        }
+    }
+
+    return reportCheck(24, basicQueries && cycles(empty) == 0 && cycles(singleton) == 0 &&
+                               cycles(selfLoop) == 1 && countedTwoEdges);
+}
+
+bool check25()
+{
+    digraph<int> empty;
+    digraph<int> singleton;
+    singleton.add(7);
+    digraph<int> cyclic;
+    cyclic.add(1, 2).add(2, 1);
+
+    bool ok = allcriticalpaths(empty).empty() &&
+              allcriticalpaths(singleton) == std::vector<std::vector<int>>({{7}}) &&
+              allcriticalpaths(cyclic).empty();
+
+    constexpr int          nodeCount = 5;
+    constexpr unsigned int edgeCount = nodeCount * (nodeCount - 1) / 2;
+    constexpr unsigned int dagCount  = 1U << edgeCount;
+
+    // Exhausting all 1,024 ordered DAGs gives deterministic property coverage
+    // for critical paths, topological orders, parallel levels, and reversal.
+    for (unsigned int mask = 0; ok && mask < dagCount; ++mask) {
+        auto graph = makeOrderedDag(mask, nodeCount);
+
+        auto actualPaths = allcriticalpaths(graph);
+        std::sort(actualPaths.begin(), actualPaths.end());
+        ok = actualPaths == referenceCriticalPaths(graph) &&
+             isValidParallelization(graph, parallelize(graph)) &&
+             isValidSerialization(graph, serialize(graph)) &&
+             isValidSchedule(graph, dfschedule(graph)) &&
+             isValidSchedule(graph, bfschedule(graph)) && reverse(reverse(graph)) == graph;
+    }
+
+    return reportCheck(25, ok);
 }

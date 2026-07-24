@@ -16,5 +16,4 @@ jobs:
     - name: build cmake project
       run: cmake --build build --config Release
     - name: execute test
-      run: ./build/Release/test.exe
-
+      run: ctest --test-dir build -C Release --output-on-failure

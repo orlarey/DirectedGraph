@@ -18,4 +18,4 @@ jobs:
     - name: build cmake project
       run: cmake --build build/ --target all
     - name: execute test
-      run: ./build/test
+      run: ctest --test-dir build --output-on-failure

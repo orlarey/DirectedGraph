@@ -27,7 +27,7 @@ int main(int, const char**)
     r &= check4();
     r &= check5();
     r &= check6();
-    // r &= check7();
+    r &= check7();
     r &= check8();
     r &= check9();
     r &= check10();
@@ -43,6 +43,9 @@ int main(int, const char**)
     r &= check20();
     r &= check21();
     r &= check22();
+    r &= check23();
+    r &= check24();
+    r &= check25();
 
     // test19(std::cout);
 

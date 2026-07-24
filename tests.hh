@@ -112,4 +112,7 @@ bool        check21();
 void        test22(std::ostream& ss);
 std::string res22();
 bool        check22();
-/**/
+
+bool check23();
+bool check24();
+bool check25();
