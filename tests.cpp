@@ -1287,3 +1287,124 @@ bool check25()
 
     return reportCheck(25, ok);
 }
+
+// The reference semantics of dfschedule is the RECURSIVE depth-first visit :
+// for each root in roots() order, visit destinations in iteration order, then
+// append the node. The production version is iterative (an explicit two-phase
+// stack, so that scheduling a pathologically deep graph cannot overflow the
+// C++ stack) and must reproduce this order EXACTLY -- the iterative form is an
+// implementation detail, not a licence to reorder. This reference is only ever
+// run on small graphs : being recursive, it is precisely what the production
+// version exists to avoid.
+template <typename N>
+static void dfscheduleReferenceVisit(const digraph<N>& graph, const N& node, std::set<N>& visited,
+                                     schedule<N>& result)
+{
+    if (visited.find(node) != visited.end()) {
+        return;
+    }
+    visited.insert(node);
+    for (const auto& destination : graph.destinations(node)) {
+        dfscheduleReferenceVisit(graph, destination.first, visited, result);
+    }
+    result.append(node);
+}
+
+template <typename N>
+static schedule<N> dfscheduleReference(const digraph<N>& graph)
+{
+    schedule<N> result;
+    std::set<N> visited;
+    for (const N& root : roots(graph)) {
+        dfscheduleReferenceVisit(graph, root, visited, result);
+    }
+    return result;
+}
+
+// dfschedule == recursive reference, element by element, on every one of the
+// 1,024 exhaustive ordered DAGs and on handcrafted multi-root shapes.
+bool check26()
+{
+    bool ok = true;
+
+    constexpr int          nodeCount = 5;
+    constexpr unsigned int edgeCount = nodeCount * (nodeCount - 1) / 2;
+    constexpr unsigned int dagCount  = 1U << edgeCount;
+
+    for (unsigned int mask = 0; ok && mask < dagCount; ++mask) {
+        auto graph     = makeOrderedDag(mask, nodeCount);
+        auto scheduled = dfschedule(graph);
+        auto reference = dfscheduleReference(graph);
+        ok             = scheduled.elements() == reference.elements();
+    }
+
+    // multi-root shape : two roots sharing a subtree, plus a private branch each
+    digraph<char> g;
+    g.add('A', 'S').add('A', 'P').add('B', 'S').add('B', 'Q').add('S', 'T');
+    auto scheduled = dfschedule(g);
+    auto reference = dfscheduleReference(g);
+    ok = ok && scheduled.elements() == reference.elements() && isValidSchedule(g, scheduled);
+
+    return reportCheck(26, ok);
+}
+
+// Convergent dependencies : a shared node is scheduled exactly once, at its
+// first completion, and later arrivals (same traversal or a later root) skip
+// it without disturbing their own order.
+bool check27()
+{
+    bool ok = true;
+
+    // the diamond : A -> B -> D, A -> C -> D
+    digraph<char> diamond;
+    diamond.add('A', 'B').add('A', 'C').add('B', 'D').add('C', 'D');
+    {
+        auto s = dfschedule(diamond);
+        auto r = dfscheduleReference(diamond);
+        ok     = isValidSchedule(diamond, s) &&
+             s.elements() == std::vector<char>({'D', 'B', 'C', 'A'}) &&
+             s.elements() == r.elements();
+    }
+
+    // cross-root convergence : the second root reaches an already scheduled
+    // subgraph ; it must skip it and still append its own spine
+    digraph<char> cross;
+    cross.add('A', 'S').add('B', 'S').add('S', 'T').add('B', 'U');
+    {
+        auto s = dfschedule(cross);
+        auto r = dfscheduleReference(cross);
+        ok     = ok && isValidSchedule(cross, s) && s.elements() == r.elements();
+    }
+
+    return reportCheck(27, ok);
+}
+
+// A pathologically deep graph must be schedulable without overflowing the C++
+// stack : this is the reason dfschedule is iterative. The recursive reference
+// would need one stack frame per node here and die well before the end (the
+// motivating crash : deep signal graphs after recursion inlining).
+bool check28()
+{
+    constexpr int chainLength = 200000;
+
+    digraph<int> chain;
+    for (int i = 0; i < chainLength - 1; i++) {
+        chain.add(i, i + 1);
+    }
+    auto s  = dfschedule(chain);
+    bool ok = int(s.size()) == chainLength && s.order(chainLength - 1) == 1 &&
+              s.order(0) == chainLength && isValidSchedule(chain, s);
+
+    // braided chain : every node also reaches depth+2, so the two-phase stack
+    // keeps meeting already visited nodes at full depth
+    constexpr int braidLength = 100000;
+    digraph<int>  braid;
+    for (int i = 0; i < braidLength - 2; i++) {
+        braid.add(i, i + 1).add(i, i + 2);
+    }
+    braid.add(braidLength - 2, braidLength - 1);
+    auto sb = dfschedule(braid);
+    ok      = ok && int(sb.size()) == braidLength && isValidSchedule(braid, sb);
+
+    return reportCheck(28, ok);
+}
