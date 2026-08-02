@@ -193,6 +193,16 @@ elle les entrelace position par position) ; et le score du combine
 peut récompenser la juxtaposition d'opérations isomorphes. Résiduel
 après SLP (bf-noslp 4.15 vs nos 7.7) : à instruire ensuite.
 
+### 2026-08-02 — ouverture de la branche combine-lab
+
+Le banc d'étalonnage du combine (méthode de Yann : optima CONSTRUITS,
+découpés en sous-expressions, le combine doit y retomber — invariance
+à la découpe, qualité Q = (trous, sur-pression, adjacence isomorphe))
+se développe sur la branche `combine-lab`. main reste la ligne stable
+multi-machines ; le merge se fait quand une version du combine passe
+les familles certifiées ET l'écran faust. Pendant la vie de la
+branche, les copies (faust/tlib/signals) suivent combine-lab.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
