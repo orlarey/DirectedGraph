@@ -67,4 +67,28 @@ superlinéaire. À profiler, puis borner ou réécrire.
   le contrat plein n'est garanti que sur DAG.
 - Test check29 : contrat de validité, plafonnement de la crête de
   vivacité vs bfschedule sur un banc de chaînes parallèles, totalité
-  sur graphe cyclique.
+  sur graphe cyclique. (Premier jet du banc réfuté par lui-même : une
+  somme finale impose un plancher de 4 vivants à TOUT ordonnancement
+  — le banc de pression doit être des chaînes indépendantes.)
+- Recopié dans faust/compiler/DirectedGraph (gitdag : synced) et
+  câblé comme `-ss 6` dans l'émission classique ocpp (R et U pris à
+  `-ls-R` / `-ls-U`).
+- Premières mesures, fdnRev classique (bencharch, min de 3 tours
+  alternés, secteur) : mc au R physique (20) PERD — 12.96 ms contre
+  df 12.38 et sp 11.66. Mais le grain n'est pas le même : un nœud de
+  l'émission classique est une expression imbriquée entière, pas une
+  opération — peu de valeurs « larges » vivantes suffisent. Au
+  balayage : **mc R=4 : 11.45 ms — meilleur ordre mesuré** (sp 11.66,
+  df 12.38, soit −7.5 % vs df) ; R=8 : 11.89 ; R=40 : 11.69. Leçon :
+  le budget R se calibre PAR GRAIN (4 au grain instruction classique,
+  20 au grain op du moteur -ls). Coût de compilation : ~3 s sur
+  fdnRev (le O(V·cycles) de v1), à surveiller sur les costly.
+
+### À suivre
+
+- Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
+- Dossier 3 : profiler spschedule/recschedule sur virtualAnalog.
+- mcschedule : banc de calibration de R au grain classique sur le
+  corpus (la campagne des ordres a l'infrastructure) ; envisager un
+  paramètre de poids par nœud (les expressions n'ont pas toutes la
+  même largeur).
