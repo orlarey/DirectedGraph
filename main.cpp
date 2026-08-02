@@ -52,6 +52,7 @@ int main(int, const char**)
     r &= check29();
     r &= check30();
     r &= check31();
+    r &= check32();
 
     // test19(std::cout);
 

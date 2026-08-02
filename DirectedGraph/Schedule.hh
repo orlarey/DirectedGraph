@@ -510,14 +510,26 @@ inline schedquality squality(const digraph<N>& G, const std::vector<N>& S, unsig
 }
 
 /**
- * @brief Optimal-ish pairwise interleaving of two sequences over G under R
- * -- the COMBINE at the heart of compositional scheduling. Both internal
- * orders are preserved; cross-dependencies are respected; the DP minimizes
+ * @brief Optimal-ish pairwise interleaving of two DISJOINT sequences over
+ * G under R -- the COMBINE at the heart of compositional scheduling.
+ *
+ * Liveness is founded on GLOBAL USAGE COUNTS (the in-degree of each value
+ * in the whole graph: its number of distinct consumers): a placed value is
+ * live while its consumed-count within the merged prefix is below its
+ * global usage -- values with consumers outside A and B therefore remain
+ * live through the whole merge, and deaths are EXACT (a value dies when
+ * its last GLOBAL consumer is placed). This makes the operator
+ * independent of any folding-order invariant: constraints are BILATERAL
+ * (a node of either side waits for its operands on the other side), so
+ * combine(A, B) and combine(B, A) face symmetric problems -- the partial
+ * commutativity of the trace monoid, restored.
+ *
+ * Both internal orders are preserved; the DP minimizes
  *   BIG * over-pressure + stalls + iso-misses
- * where a stall places a node right after one of its operands and an
- * iso-miss is an adjacency that could have been isomorphic-independent
- * (rewarding superword opportunities) when a shape functor is given.
- * Ties prefer staying on the same sequence (locality by default).
+ * (stall: node right after one of its operands; iso-miss: an adjacency
+ * that could have been isomorphic-independent, when a shape functor is
+ * given). Ties prefer staying on the same sequence: locality by default,
+ * interleaving where it pays.
  */
 template <typename N>
 inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::vector<N> A,
@@ -536,7 +548,6 @@ inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::
         cat.insert(cat.end(), B.begin(), B.end());
         return cat;
     }
-    auto consumers = [&](const N& n) -> const auto& { return Rg.destinations(n); };
     std::map<N, int> pA, pB;
     for (int i = 0; i < na; i++) {
         pA[A[i]] = i;
@@ -544,7 +555,43 @@ inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::
     for (int j = 0; j < nb; j++) {
         pB[B[j]] = j;
     }
-    std::vector<int> minI(nb, 0);
+    // global usage counts, and the positions of each value's consumers
+    // inside A and inside B (for exact prefix-consumption counting)
+    std::map<N, int>              usage;
+    std::map<N, std::vector<int>> consA, consB;
+    auto note = [&](const N& x) {
+        if (usage.count(x)) {
+            return;
+        }
+        usage[x] = int(Rg.destinations(x).size());
+        for (const auto& c : Rg.destinations(x)) {
+            auto ia = pA.find(c.first);
+            auto ib = pB.find(c.first);
+            if (ia != pA.end()) {
+                consA[x].push_back(ia->second);
+            } else if (ib != pB.end()) {
+                consB[x].push_back(ib->second);
+            }
+        }
+        std::sort(consA[x].begin(), consA[x].end());
+        std::sort(consB[x].begin(), consB[x].end());
+    };
+    for (const N& x : A) {
+        note(x);
+    }
+    for (const N& x : B) {
+        note(x);
+    }
+    auto countLE = [](const std::vector<int>& v, int lim) {
+        return int(std::upper_bound(v.begin(), v.end(), lim) - v.begin());
+    };
+    // consumed count of x in the prefix (i first of A, j first of B)
+    auto consumed = [&](const N& x, int i, int j) {
+        return countLE(consA[x], i - 1) + countLE(consB[x], j - 1);
+    };
+    // BILATERAL cross-constraints: a node waits for its operands living on
+    // the other side
+    std::vector<int> minI(nb, 0), minJ(na, 0);
     for (int j = 0; j < nb; j++) {
         int need = (j > 0) ? minI[j - 1] : 0;
         for (const auto& d : G.destinations(B[j])) {
@@ -555,53 +602,16 @@ inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::
         }
         minI[j] = need;
     }
-    std::map<N, int>  lastA, lastB;
-    std::map<N, bool> ext;
-    auto scan = [&](const N& x) {
-        int la = -1, lb = -1;
-        bool e = false;
-        for (const auto& c : consumers(x)) {
-            auto ia = pA.find(c.first);
-            auto ib = pB.find(c.first);
-            if (ia != pA.end()) {
-                la = std::max(la, ia->second);
-            } else if (ib != pB.end()) {
-                lb = std::max(lb, ib->second);
-            } else {
-                e = true;
+    for (int i = 0; i < na; i++) {
+        int need = (i > 0) ? minJ[i - 1] : 0;
+        for (const auto& d : G.destinations(A[i])) {
+            auto it = pB.find(d.first);
+            if (it != pB.end() && it->second + 1 > need) {
+                need = it->second + 1;
             }
         }
-        lastA[x] = la;
-        lastB[x] = lb;
-        ext[x]   = e;
-    };
-    for (const N& x : A) {
-        scan(x);
+        minJ[i] = need;
     }
-    for (const N& x : B) {
-        scan(x);
-    }
-    std::vector<std::vector<int>> dieA(na), dieB(nb);
-    auto put = [&](const N& x, int u) {
-        int la = lastA[x], lb = lastB[x];
-        if (ext[x] || (la < 0 && lb < 0)) {
-            return;
-        }
-        if (lb < 0) {
-            dieA[la].push_back(u);
-        } else if (la < 0) {
-            dieB[lb].push_back(u);
-        } else {
-            dieA[la].push_back(u);
-        }
-    };
-    for (int i = 0; i < na; i++) {
-        put(A[i], i);
-    }
-    for (int j = 0; j < nb; j++) {
-        put(B[j], na + j);
-    }
-    auto liveAfter = [&](const N& u) { return ext[u] || lastA[u] >= 0 || lastB[u] >= 0; };
     auto dependsOn = [&](const N& u, const N& v) {
         for (const auto& d : G.destinations(u)) {
             if (d.first == v) {
@@ -631,13 +641,23 @@ inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::
                     prev = (s == 0) ? (i > 0 ? &A[i - 1] : nullptr)
                                     : (j > 0 ? &B[j - 1] : nullptr);
                 }
-                auto relax = [&](int ni, int nj, int ns, const N& u,
-                                 const std::vector<int>& dies, int guardJ) {
-                    int l = l0 + (liveAfter(u) ? 1 : 0);
-                    for (int x : dies) {
-                        int lbx = lastB[(x < na) ? A[x] : B[x - na]];
-                        if (lbx < 0 || lbx <= guardJ) {
-                            l--;
+                auto relax = [&](int ni, int nj, int ns, const N& u) {
+                    // exact liveness from the usage counters: placing u
+                    // makes it live iff consumers remain beyond the new
+                    // prefix; each operand whose LAST global consumer is u
+                    // (within this prefix) dies
+                    int l = l0 + ((usage[u] - consumed(u, ni, nj) > 0) ? 1 : 0);
+                    for (const auto& d : G.destinations(u)) {
+                        const N& x = d.first;
+                        if (x == u || (!pA.count(x) && !pB.count(x))) {
+                            continue;
+                        }
+                        if (consumed(x, ni, nj) == usage[x]) {
+                            // u completed x's global consumption iff x was
+                            // still live just before
+                            if (usage[x] - consumed(x, i, j) > 0) {
+                                l--;
+                            }
                         }
                     }
                     long pen = PBIG * std::max(0, l - int(R));
@@ -657,11 +677,11 @@ inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::
                         par[k]  = char(s + 1);
                     }
                 };
-                if (i < na) {
-                    relax(i + 1, j, 0, A[i], dieA[i], j - 1);
+                if (i < na && minJ[i] <= j) {
+                    relax(i + 1, j, 0, A[i]);
                 }
                 if (j < nb && minI[j] <= i) {
-                    relax(i, j + 1, 1, B[j], dieB[j], j);
+                    relax(i, j + 1, 1, B[j]);
                 }
             }
         }
@@ -684,7 +704,8 @@ inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::
 }
 
 template <typename N>
-inline schedule<N> csschedule(const digraph<N>& G, unsigned int R, unsigned int U)
+inline schedule<N> csschedule(const digraph<N>& G, unsigned int R, unsigned int U,
+                              std::function<long(const N&)> shape = nullptr)
 {
     (void)U;
     const schedule<N>     topo  = dfschedule(G);
@@ -742,170 +763,9 @@ inline schedule<N> csschedule(const digraph<N>& G, unsigned int R, unsigned int 
         children[idom[i]].push_back(i);
     }
 
-    // ---- the pairwise merge (DP with side-memory for the stall term)
-    auto dpmerge = [&](std::vector<N> A, std::vector<N> B) -> std::vector<N> {
-        const int na = int(A.size()), nb = int(B.size());
-        if (na == 0) {
-            return B;
-        }
-        if (nb == 0) {
-            return A;
-        }
-        std::vector<N> cat;  // the guarded fallback: concatenation
-        if (long(na + 1) * long(nb + 1) > 4000000L) {
-            cat = A;
-            cat.insert(cat.end(), B.begin(), B.end());
-            return cat;
-        }
-        std::map<N, int> pA, pB;
-        for (int i = 0; i < na; i++) {
-            pA[A[i]] = i;
-        }
-        for (int j = 0; j < nb; j++) {
-            pB[B[j]] = j;
-        }
-        // cross-deps: B[j] cannot precede its operands living in A
-        std::vector<int> minI(nb, 0);
-        for (int j = 0; j < nb; j++) {
-            int need = (j > 0) ? minI[j - 1] : 0;
-            for (const auto& d : G.destinations(B[j])) {
-                auto it = pA.find(d.first);
-                if (it != pA.end() && it->second + 1 > need) {
-                    need = it->second + 1;
-                }
-            }
-            minI[j] = need;
-        }
-        // liveness: last consumer coordinate on each side; a consumer
-        // outside A and B keeps the value live for this whole merge
-        std::map<N, int>  lastA, lastB;
-        std::map<N, bool> ext;
-        auto scan = [&](const N& x) {
-            int la = -1, lb = -1;
-            bool e = false;
-            for (const auto& c : consumers(x)) {
-                auto ia = pA.find(c.first);
-                auto ib = pB.find(c.first);
-                if (ia != pA.end()) {
-                    la = std::max(la, ia->second);
-                } else if (ib != pB.end()) {
-                    lb = std::max(lb, ib->second);
-                } else {
-                    e = true;
-                }
-            }
-            lastA[x] = la;
-            lastB[x] = lb;
-            ext[x]   = e;
-        };
-        for (const N& x : A) {
-            scan(x);
-        }
-        for (const N& x : B) {
-            scan(x);
-        }
-        std::vector<std::vector<int>> dieA(na), dieB(nb);  // indexes into A/B universe
-        std::vector<N>                univ;
-        univ.reserve(na + nb);
-        univ.insert(univ.end(), A.begin(), A.end());
-        univ.insert(univ.end(), B.begin(), B.end());
-        for (const N& x : univ) {
-            if (ext[x]) {
-                continue;
-            }
-            int la = lastA[x], lb = lastB[x];
-            if (la < 0 && lb < 0) {
-                continue;  // never consumed here: never live in this merge
-            }
-            if (lb < 0) {
-                dieA[la].push_back(pB.count(x) ? na + pB[x] : pA[x]);
-            } else if (la < 0) {
-                dieB[lb].push_back(pB.count(x) ? na + pB[x] : pA[x]);
-            } else {
-                dieA[la].push_back(pB.count(x) ? na + pB[x] : pA[x]);  // guarded by j at DP time
-            }
-        }
-        auto liveAfter = [&](const N& u) {
-            if (ext[u]) {
-                return true;
-            }
-            return lastA[u] >= 0 || lastB[u] >= 0;
-        };
-        auto dependsOn = [&](const N& u, const N& v) {
-            for (const auto& d : G.destinations(u)) {
-                if (d.first == v) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        const long      PBIG = 1000000L;
-        const int       W    = nb + 1;
-        const long      INF  = LONG_MAX / 4;
-        std::vector<long> cost(size_t(na + 1) * W * 2, INF);
-        std::vector<int>  live(size_t(na + 1) * W * 2, 0);
-        std::vector<char> par(size_t(na + 1) * W * 2, 0);  // 1 from A, 2 from B
-        auto id = [&](int i, int j, int s) { return (size_t(i) * W + j) * 2 + s; };
-        cost[id(0, 0, 0)] = 0;
-        for (int i = 0; i <= na; i++) {
-            for (int j = 0; j <= nb; j++) {
-                for (int s = 0; s < 2; s++) {
-                    long c0 = cost[id(i, j, s)];
-                    if (c0 >= INF) {
-                        continue;
-                    }
-                    int l0 = live[id(i, j, s)];
-                    const N* prev = nullptr;
-                    if (i + j > 0) {
-                        prev = (s == 0) ? (i > 0 ? &A[i - 1] : nullptr)
-                                        : (j > 0 ? &B[j - 1] : nullptr);
-                    }
-                    auto relax = [&](int ni, int nj, int ns, const N& u,
-                                     const std::vector<int>& dies, int dieGuardJ) {
-                        int l = l0 + (liveAfter(u) ? 1 : 0);
-                        for (int x : dies) {
-                            int lbx = lastB[(x < na) ? A[x] : B[x - na]];
-                            if (lbx < 0 || lbx <= dieGuardJ) {
-                                l--;
-                            }
-                        }
-                        long stall = (prev != nullptr && dependsOn(u, *prev)) ? 1 : 0;
-                        long c     = c0 + PBIG * std::max(0, l - int(R)) + stall;
-                        size_t k   = id(ni, nj, ns);
-                        bool same  = (ns == s);  // prefer staying on a side
-                        if (c < cost[k] || (c == cost[k] && same && par[k] == 0)) {
-                            cost[k] = c;
-                            live[k] = l;
-                            par[k]  = char(s + 1);
-                        }
-                    };
-                    if (i < na) {
-                        relax(i + 1, j, 0, A[i], dieA.empty() ? std::vector<int>{} : dieA[i],
-                              j - 1);
-                    }
-                    if (j < nb && minI[j] <= i) {
-                        relax(i, j + 1, 1, B[j], dieB.empty() ? std::vector<int>{} : dieB[j],
-                              j);
-                    }
-                }
-            }
-        }
-        // best final state
-        int  sEnd = (cost[id(na, nb, 0)] <= cost[id(na, nb, 1)]) ? 0 : 1;
-        std::vector<N> merged;
-        merged.reserve(na + nb);
-        int i = na, j = nb, sc = sEnd;
-        while (i > 0 || j > 0) {
-            char p = par[id(i, j, sc)];
-            if (sc == 0) {
-                merged.push_back(A[--i]);
-            } else {
-                merged.push_back(B[--j]);
-            }
-            sc = (p == 1) ? 0 : (p == 2) ? 1 : sc;
-        }
-        std::reverse(merged.begin(), merged.end());
-        return merged;
+    // ---- the pairwise merge: the library operator (usage-count exact)
+    auto dpmerge = [&](std::vector<N> A, std::vector<N> B) {
+        return dpcombine(G, Rg, std::move(A), std::move(B), R, shape);
     };
 
     // ---- bottom-up along the dominator tree: operands-first order means

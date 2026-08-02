@@ -227,6 +227,36 @@ pliage avec terme iso (l'optimum retrouvé) ; et
 comme chemin dans la grille |A|×|B|, l'escalier du tressage contre le
 L de la concaténation.
 
+### 2026-08-03 — les compteurs d'usages fondent l'algèbre ; les lois tiennent
+
+Point de Yann : la pression exige un mapping global t -> nombre
+d'usages (les consommateurs distincts dans le graphe entier) — sans
+lui, la vivacité repose sur des invariants d'ordre de pliage et
+l'algèbre est infondée. Refonte de dpcombine : vivacité EXACTE par
+compteurs d'usages (une valeur meurt à son vrai dernier consommateur
+GLOBAL ; les morts approximées de la v1 disparaissent), contraintes
+BILATÉRALES (minI et minJ : chaque côté attend ses opérandes de
+l'autre — la commutativité partielle du monoïde de traces restaurée),
+csschedule rebranché sur l'opérateur unique (une seule source).
+Nuance documentée : usage = consommateurs DISTINCTS (degré entrant),
+pas occurrences textuelles — x*x n'use x qu'une fois au sens de la
+vivacité ; côté faust c'est OccMarkup/getSharingCount.
+
+check32, les LOIS : bank(4,6) — 4 permutations des pièces + pliage en
+arbre équilibré -> Q(optimum) partout (commutativité et associativité
+EN QUALITÉ). Famille à partage diamant(4,5) (source S, usage 4,
+lue par 4 chaînes iso) : optimum certifié (6 cycles, 3 trous
+incompressibles = U-1, peak 4, isoadj 15) atteint par toutes les
+permutations, y compris S plié EN DERNIER — les contraintes
+bilatérales le replacent en tête, les compteurs le font mourir à sa
+4e consommation. Le tableau check31 est inchangé (la refonte préserve
+les acquis).
+
+Cible atteinte sur ces familles : (schedules mod Q, +) se comporte en
+monoïde partiellement commutatif. Suivant : familles à partage plus
+riches (coefficients communs, m25), vivacité de queue multi-niveaux
+dans csschedule, et le branchement de la forme des Trees côté faust.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.

@@ -1611,3 +1611,150 @@ bool check31()
     }
     return reportCheck(31, ok);
 }
+
+// Laws of the combine (branch combine-lab): commutativity-in-quality over
+// piece permutations, associativity-in-quality over fold shapes, and the
+// first SHARING family (diamond bank: one source consumed by k chains --
+// usage counts at work). Quality equality = same (cycles, holes, peak,
+// isoadj) as the certified optimum.
+static bool sameQ(const schedquality& a, const schedquality& b)
+{
+    return a.cycles == b.cycles && a.holes == b.holes && a.peak == b.peak &&
+           a.isoadj == b.isoadj;
+}
+
+static std::vector<int> foldOrder(const digraph<int>& g,
+                                  const std::vector<std::vector<int>>& pieces,
+                                  const std::vector<int>& order, unsigned R)
+{
+    digraph<int>     rg = reverse(g);
+    std::function<long(const int&)> sh = bankshape;
+    std::vector<int> acc;
+    for (int k : order) {
+        acc = dpcombine(g, rg, std::move(acc), pieces[k], R, sh);
+    }
+    return acc;
+}
+
+static std::vector<int> foldTree(const digraph<int>& g,
+                                 const std::vector<std::vector<int>>& pieces, unsigned R)
+{
+    digraph<int>     rg = reverse(g);
+    std::function<long(const int&)> sh = bankshape;
+    std::vector<std::vector<int>> level = pieces;
+    while (level.size() > 1) {  // balanced: ((a+b)+(c+d))
+        std::vector<std::vector<int>> next;
+        for (size_t i = 0; i + 1 < level.size(); i += 2) {
+            next.push_back(dpcombine(g, rg, level[i], level[i + 1], R, sh));
+        }
+        if (level.size() % 2) {
+            next.push_back(level.back());
+        }
+        level = next;
+    }
+    return level[0];
+}
+
+bool check32()
+{
+    bool ok = true;
+    const unsigned U = 4;
+
+    // ---- bank(4,6): permutations and fold shapes must all reach optimum
+    {
+        const int k = 4, d = 6;
+        digraph<int>     g;
+        std::vector<int> opt;
+        bankgraph(k, d, g, opt);
+        auto qopt = squality(g, opt, unsigned(k), U, std::function<long(const int&)>(bankshape));
+        std::vector<std::vector<int>> pieces;
+        for (int c = 0; c < k; c++) {
+            std::vector<int> p;
+            for (int t = 0; t < d; t++) {
+                p.push_back(c * 1000 + t);
+            }
+            pieces.push_back(p);
+        }
+        std::vector<std::vector<int>> perms = {
+            {0, 1, 2, 3}, {3, 2, 1, 0}, {1, 3, 0, 2}, {2, 0, 3, 1}};
+        for (const auto& pm : perms) {
+            auto rec = foldOrder(g, pieces, pm, k);
+            schedule<int> S;
+            for (int n : rec) {
+                S.append(n);
+            }
+            auto q = squality(g, rec, unsigned(k), U,
+                              std::function<long(const int&)>(bankshape));
+            bool good = isValidSchedule(g, S) && sameQ(q, qopt);
+            if (!good) {
+                std::cout << "combine-lab LOI bank perm échouée\n";
+            }
+            ok = ok && good;
+        }
+        auto rec = foldTree(g, pieces, k);
+        schedule<int> S;
+        for (int n : rec) {
+            S.append(n);
+        }
+        ok = ok && isValidSchedule(g, S) &&
+             sameQ(squality(g, rec, unsigned(k), U,
+                            std::function<long(const int&)>(bankshape)),
+                   qopt);
+        std::cout << "combine-lab  lois bank(4,6): 4 permutations + arbre équilibré -> "
+                  << (ok ? "Q(optimum) partout" : "ÉCHEC") << '\n';
+    }
+
+    // ---- diamond bank: one shared source S (id 9000, usage k) + k chains
+    {
+        const int k = 4, d = 5;
+        digraph<int>     g;
+        std::vector<int> opt;
+        for (int c = 0; c < k; c++) {
+            g.add(c * 1000 + 0, 9000);  // chain head reads the shared source
+            for (int t = 1; t < d; t++) {
+                g.add(c * 1000 + t, c * 1000 + t - 1);
+            }
+        }
+        opt.push_back(9000);
+        for (int t = 0; t < d; t++) {
+            for (int c = 0; c < k; c++) {
+                opt.push_back(c * 1000 + t);
+            }
+        }
+        auto sh   = std::function<long(const int&)>(bankshape);
+        auto qopt = squality(g, opt, unsigned(k), U, sh);
+        std::cout << "combine-lab  diamant(4,5) optimum: cycles " << qopt.cycles
+                  << " holes " << qopt.holes << " peak " << qopt.peak << " isoadj "
+                  << qopt.isoadj << '\n';
+        std::vector<std::vector<int>> pieces;
+        pieces.push_back({9000});
+        for (int c = 0; c < k; c++) {
+            std::vector<int> p;
+            for (int t = 0; t < d; t++) {
+                p.push_back(c * 1000 + t);
+            }
+            pieces.push_back(p);
+        }
+        // permutations mettant S en tête, au milieu, en queue
+        std::vector<std::vector<int>> perms = {
+            {0, 1, 2, 3, 4}, {1, 2, 0, 3, 4}, {4, 3, 2, 1, 0}};
+        for (const auto& pm : perms) {
+            auto rec = foldOrder(g, pieces, pm, k);
+            schedule<int> S;
+            for (int n : rec) {
+                S.append(n);
+            }
+            auto q     = squality(g, rec, unsigned(k), U, sh);
+            bool valid = isValidSchedule(g, S);
+            std::cout << "combine-lab  diamant perm {";
+            for (int x : pm) {
+                std::cout << x;
+            }
+            std::cout << "} : cycles " << q.cycles << " holes " << q.holes << " peak "
+                      << q.peak << " isoadj " << q.isoadj
+                      << (valid ? "" : "  INVALID") << '\n';
+            ok = ok && valid && sameQ(q, qopt);
+        }
+    }
+    return reportCheck(32, ok);
+}
