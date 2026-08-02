@@ -331,6 +331,26 @@ sur vocoder). Prochaine marche : allonger les séries (lots par forme,
 pas seulement par indépendance) ; et re-campagne grille complète sous
 v5.
 
+### 2026-08-04 — les formes : le calcul sans les données
+
+Proposition de Yann : la forme d'une expression = l'expression où l'on
+« oublie » les données pour ne garder que le calcul. Implémenté côté
+faust (ocppShape) : la forme est ELLE-MÊME un arbre hash-consé —
+feuilles de données -> trous typés, enfants ordonnancés -> trous de
+référence (la frontière de troncature), offsets de délais constants
+oubliés par la règle générique, cycles rec coupés par garde. Deux
+instructions sont isomorphes ssi même pointeur de forme. Branché dans
+-ss 7 et l'indicateur qualité (isoadj honnête : vocoder 627).
+
+Verdicts : clarinet ×4.8 préservé (0.374 bit-exact) ; vocoder inchangé
+— confirmation que le verrou est la LONGUEUR des runs. Le tri des
+frères par forme (lots homogènes) : isoadj inchangé, les bandes ne
+sont PAS frères dans l'arbre de dominance — reverté. Conclusion de
+conception : allonger les runs = regroupement GLOBAL par forme à
+travers le graphe = le mouvement BANK proprement dit, dont shape()
+est désormais la primitive de reconnaissance. C'est le prochain
+chantier de fond, avec la re-campagne v6 sur le corpus.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
