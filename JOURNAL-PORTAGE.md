@@ -218,6 +218,15 @@ optimum-construit→découpes→reconstruction a désigné et calé le terme
 en une itération. Suivant : brancher la forme des nœuds côté faust
 (symbole de l'op du Tree) dans csschedule, et re-passer vocoder.
 
+Illustrations (données réelles de dpcombine, `labviz.cpp` +
+`figs/labviz.py`) : [figs/combine-process.png](figs/combine-process.png)
+— les 4 pièces, l'optimum certifié, le pliage sans terme iso (11
+cycles, 20 trous, où l'on VOIT l'histoire du pliage par paires) et le
+pliage avec terme iso (l'optimum retrouvé) ; et
+[figs/combine-dp-path.png](figs/combine-dp-path.png) — le combine
+comme chemin dans la grille |A|×|B|, l'escalier du tressage contre le
+L de la concaténation.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
