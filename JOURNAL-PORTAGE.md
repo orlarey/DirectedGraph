@@ -136,6 +136,36 @@ niveaux de bf conservé, la police (R, U) appliquée à l'intérieur de
 chaque niveau), qui hérite du layout-balayage de bf par
 construction.
 
+### 2026-08-02 (nuit) — csschedule v1 : le fold trahit la récursion
+
+Formulation de Yann : le scheduling comme REMPLISSAGE d'une grille
+U × cycles sous contrainte R (qualité = cases vides), défini
+récursivement sur l'expression — scheduler les arguments, COMBINER
+leurs schedulings sous R en minimisant les trous, ajouter le
+combinateur ; le cœur est l'opérateur de combinaison de deux
+schedulings. Trois amendements actés : la récursion se fait sur le
+DAG-à-lets (le partage hoisté), les queues de vivacité bornent
+l'idéal (l'arité plancher), et le combine par paire est calculable
+exactement (DP sur la grille |A|×|B|, ordres internes préservés,
+dépendances croisées, sur-pression minimisée, alternance préférée).
+
+Implémenté : `csschedule<N>(G, R, U)` v1 = régions df (localité par
+blocs) + FOLD LINÉAIRE des lets en ordre topo, chaque région fusionnée
+dans l'accumulateur par le DP. check30 OK. Câblé `-ss 7` côté faust
+(via graph2dag pour les cycles).
+
+Écran (6 programmes, même session) : **cs v1 ≡ mc** — égale les
+gagnants de la classe pression (bowedString 5.95 vs 7.5 fixe, dbmeter
+1.075, karplus 1.14) et échoue À L'IDENTIQUE sur la classe légère
+(vocoder 7.67 ≈ mc 7.64 ; insects 13.7 ; fire 4.24). Diagnostic : le
+fold linéaire APLATIT la récursion — sur les programmes à fort
+partage, les régions sont des singletons et le fold dégénère en
+entrelacement global glouton, c'est-à-dire mc. La hiérarchie est le
+porteur de la localité : la combinaison doit suivre l'ARBRE DE
+DOMINANCE du DAG (chaque let combiné chez son dominateur immédiat,
+les blocs frères combinés localement puis remontés comme unités) —
+csschedule v2.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.

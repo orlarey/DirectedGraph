@@ -1483,3 +1483,33 @@ bool check29()
 
     return reportCheck(29, ok);
 }
+
+// csschedule : the compositional (regions + DP combine) scheduler.
+// Contract on DAGs, pressure no worse than breadth-first on the bank.
+bool check30()
+{
+    bool ok = true;
+
+    digraph<char> diamond;
+    diamond.add('A', 'B').add('A', 'C').add('B', 'D').add('C', 'D');
+    ok = ok && isValidSchedule(diamond, csschedule(diamond, 4U, 2U));
+
+    digraph<int> bank;
+    for (int c = 0; c < 4; c++) {
+        for (int i = 0; i < 5; i++) {
+            bank.add(c * 100 + i + 1, c * 100 + i);
+        }
+    }
+    auto cs = csschedule(bank, 2U, 2U);
+    ok      = ok && isValidSchedule(bank, cs);
+    ok      = ok && livePeak(bank, cs) <= livePeak(bank, bfschedule(bank));
+
+    digraph<int> summed = bank;
+    for (int c = 0; c < 4; c++) {
+        summed.add(999, c * 100 + 5);
+    }
+    ok = ok && isValidSchedule(summed, csschedule(summed, 2U, 2U));
+    ok = ok && isValidSchedule(summed, csschedule(summed, 100U, 4U));
+
+    return reportCheck(30, ok);
+}

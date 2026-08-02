@@ -121,3 +121,5 @@ bool check27();
 bool check28();
 
 bool check29();
+
+bool check30();
