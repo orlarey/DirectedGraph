@@ -257,6 +257,34 @@ monoïde partiellement commutatif. Suivant : familles à partage plus
 riches (coefficients communs, m25), vivacité de queue multi-niveaux
 dans csschedule, et le branchement de la forme des Trees côté faust.
 
+### 2026-08-03 — L'ARTEFACT : tout l'écran mc/cs mesurait l'émission -ls
+
+Découvert en inspectant un .cpp généré : les options-paramètres
+faust `-ls-R`/`-ls-U` (et toutes les -ls-*) activaient silencieusement
+gLoopSplit — CHAQUE mesure `-ss 6/7 -ls-R X` depuis l'ouverture du
+chantier benchmarkait l'émission loop-split, pas l'ordre classique.
+Le « mur des 7.6 » de vocoder identique à travers quatre architectures
+= le -ls tout court (7.77 la nuit d'avant) ; la « victoire pression »
+de bowedString (5.87) = -ls aussi ; la réfutation 5/22 de l'hypothèse
+(R,U) = RETIRÉE, jamais testée. Survivent : les 5 ordres fixes,
+l'ablation SLP de bf (bf/vocoder passe de 1.16 à 4.1 sans superword),
+et tout le travail de la librairie (banc, lois, compteurs — mesuré sur
+optima construits, pas sur faust).
+
+Correctif : les paramètres ne commutent plus les modes (seuls -ls et
+-ls-fuse activent). PREMIÈRES VRAIES MESURES des ordres (même session,
+6 programmes) : cs GAGNE karplus32 (1.28 vs df 1.32), mc ÉGALE dbmeter
+(1.23 vs bf 1.24), vocoder cs 2.66 — le terme iso au grain instruction
+paie (−35 % sous df), bf (1.16) garde l'avance SLP ; fire cs 1.60 (sp
+1.44), insects cs 6.83 (bf 5.78), bowedString ~8.3 (sp 7.56).
+Hypothèse (R,U) ROUVERTE — les vrais ordres sont compétitifs, ni
+catastrophe ni miracle. Re-campagne grille à refaire proprement.
+
+Leçon d'instrument (la troisième du chantier, après fast-math et le
+grain des groupes) : une option qui commute un mode en réglant un
+paramètre est un piège de mesure — et « attribuer exige d'ablater »
+vaut aussi pour ses propres options.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
