@@ -166,6 +166,33 @@ DOMINANCE du DAG (chaque let combiné chez son dominateur immédiat,
 les blocs frères combinés localement puis remontés comme unités) —
 csschedule v2.
 
+### 2026-08-02 (tard) — v2 dominance, v3 round-robin, et le vrai nom de la localité : SLP
+
+csschedule v2 (association par l'arbre de dominance, terme de stalle,
+départage concaténation) : les gagnants pression s'améliorent encore
+(dbmeter 1.055, bowedString 5.82 — records), les échecs INCHANGÉS au
+centième. v3 (round-robin régulier par lots ≤ R pour les enfants
+indépendants — la théorie du balayage préchargeable, convergente avec
+les paquets m99 du moteur -ls) : idem. Trois architectures, le même
+échec exact → la variable n'était pas l'algorithme.
+
+**Ablation décisive** : vocoder en bf passe de 1.155 à 4.08-4.15 ms
+sous `-fno-slp-vectorize` (et -fno-vectorize n'ajoute rien). Les ¾ de
+l'avantage de bf sont de la **vectorisation superword** : bf juxtapose
+l'étape k de toutes les bandes — des instructions isomorphes
+indépendantes adjacentes, que le SLP packe en NEON. Tous nos ordres
+par blocs (df-régions, dominance, rr de groupes) détruisent cette
+adjacence : via graph2dag, le round-robin tournait sur des groupes-SCC
+entiers, chaque bande restant un bloc df interne — le bon geste au
+mauvais grain. La « localité » manquante = l'adjacence isomorphe,
+c'est le mouvement Bank redécouvert (3e fois).
+
+v4 spécifiée : entrelacement AU GRAIN INSTRUCTION des groupes frères
+indépendants (l'expansion des lots ne concatène plus les df internes,
+elle les entrelace position par position) ; et le score du combine
+peut récompenser la juxtaposition d'opérations isomorphes. Résiduel
+après SLP (bf-noslp 4.15 vs nos 7.7) : à instruire ensuite.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
