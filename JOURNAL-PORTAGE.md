@@ -303,6 +303,34 @@ Suites : durcir les familles bank du banc (le résidu SLP du combine),
 pondération de l'iso-terme, et la sélection (stratégie, R, U) par
 programme jugée compute_stack.
 
+### 2026-08-03 (nuit) — v5 : csschedule direct au grain Tree ; clarinet ×4.8
+
+L'indicateur de remplissage de Yann (cases occupées / cycles×U, machine
+d'évaluation commune) a tout déclenché : le résidu SLP est un déficit
+de remplissage (nos vainqueurs 40-46 % vs bf 88-99 %), et la pression
+du modèle compte moins que modélisé sur le classique (bf gagne à crête
+299-779 : le renommage OoO absorbe).
+
+Banc durci (check33) : blocs(4,4,4) — reconstruction = optimum, les
+étapes-blocs innocentées ; large(16,6,R4) — le pliage par paires perd
+15 % de remplissage, mais csschedule DIRECT (son round-robin par lots
+= le tuilage) atteint l'optimum exact. Conclusion : la machinerie de
+la librairie était complète, le déficit était dans le câblage faust
+(association aux groupes seulement, repli par paires au grain
+instruction).
+
+v5 : `-ss 7` = csschedule directement sur le graphe de Trees (les
+arêtes arrière ignorées par ses structures comme df les ignore).
+Résultats, bit-exacts vérifiés strict : **clarinet 0.374 ms — ×4.8
+sous le meilleur ordre fixe** (sp 1.782) et ×4.3 sous l'ancien cs ;
+karplus32 1.260 ; filterBank 5.102 ; vocoder : remplissage 43→73 %,
+isoadj 493→930, temps 2.62 (bf 1.14 : la monnaie réelle n'est pas le
+TAUX d'adjacence mais la LONGUEUR des séries isomorphes — le SLP
+packe par 4) ; churchOrgan −1 % ; génération 4.5× plus rapide (0.97 s
+sur vocoder). Prochaine marche : allonger les séries (lots par forme,
+pas seulement par indépendance) ; et re-campagne grille complète sous
+v5.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
