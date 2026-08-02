@@ -1408,3 +1408,78 @@ bool check28()
 
     return reportCheck(28, ok);
 }
+
+// Live-value peak of a schedule : after each issue, a node is live while it
+// still has unscheduled consumers. This is the register-pressure proxy that
+// mcschedule is supposed to police.
+template <typename N>
+static int livePeak(const digraph<N>& g, const schedule<N>& s)
+{
+    digraph<N>       rg = reverse(g);
+    std::map<N, int> pending;
+    for (const N& n : g.nodes()) {
+        pending[n] = int(rg.destinations(n).size());
+    }
+    int live = 0;
+    int peak = 0;
+    for (const N& n : s.elements()) {
+        if (pending[n] > 0) {
+            live++;
+        }
+        for (const auto& d : g.destinations(n)) {
+            if (--pending[d.first] == 0) {
+                live--;
+            }
+        }
+        peak = std::max(peak, live);
+    }
+    return peak;
+}
+
+// mcschedule : the model-constrained list scheduler. Contract on DAGs,
+// pressure policing on a bank of parallel chains (breadth-first keeps every
+// chain live at once ; mcschedule under a small R narrows the front), and
+// totality on cyclic graphs (deadlock-breaking fallback).
+bool check29()
+{
+    bool ok = true;
+
+    // the diamond : contract only
+    digraph<char> diamond;
+    diamond.add('A', 'B').add('A', 'C').add('B', 'D').add('C', 'D');
+    ok = ok && isValidSchedule(diamond, mcschedule(diamond, 4U, 2U));
+
+    // a bank of 4 INDEPENDENT chains of depth 6 : node c*100+i, each element
+    // depends on the previous one. A final sum would set a live floor of 4
+    // for EVERY schedule (the four ends wait together) -- kept out here so
+    // the pressure difference is attributable to the scheduling policy.
+    digraph<int> bank;
+    for (int c = 0; c < 4; c++) {
+        for (int i = 0; i < 5; i++) {
+            bank.add(c * 100 + i + 1, c * 100 + i);
+        }
+    }
+    auto mc = mcschedule(bank, 2U, 2U);
+    auto bf = bfschedule(bank);
+    ok      = ok && isValidSchedule(bank, mc) && isValidSchedule(bank, bf);
+    // breadth-first keeps the 4 chains live together (peak 4) ; the model
+    // under R=2 narrows the front to its budget plus the issue transition
+    ok = ok && livePeak(bank, mc) < livePeak(bank, bf);
+    ok = ok && livePeak(bank, mc) <= 3;
+
+    // same bank joined by a final sum : contract only (any schedule floors
+    // at 4 live ends there), wide and narrow budgets
+    digraph<int> summed = bank;
+    for (int c = 0; c < 4; c++) {
+        summed.add(999, c * 100 + 5);
+    }
+    ok = ok && isValidSchedule(summed, mcschedule(summed, 2U, 2U));
+    ok = ok && isValidSchedule(summed, mcschedule(summed, 100U, 4U));
+
+    // cyclic graph : totality via the fallback (validity is meaningless here)
+    digraph<int> loop;
+    loop.add(1, 2).add(2, 1).add(3, 1);
+    ok = ok && mcschedule(loop, 4U, 2U).size() == loop.nodes().size();
+
+    return reportCheck(29, ok);
+}
