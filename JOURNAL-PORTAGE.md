@@ -203,6 +203,21 @@ multi-machines ; le merge se fait quand une version du combine passe
 les familles certifiées ET l'écran faust. Pendant la vie de la
 branche, les copies (faust/tlib/signals) suivent combine-lab.
 
+### 2026-08-02 — le banc d'étalonnage converge en une itération
+
+`squality` (cycles/trous par empaquetage latence-1, sur-pression,
+adjacence isomorphe par foncteur de forme), `dpcombine` extrait en
+fonction publique avec le nouveau terme ISOMISS (2, contre STALL 3,
+pression PBIG), familles+découpes dans check31. Résultat immédiat sur
+bank(4,6) : sans le terme iso, TOUTES les découpes échouent (chaînes :
+11 cycles, 20 trous ; niveaux : idem) ; AVEC le terme iso, les trois
+découpes (chaînes, moitiés, niveaux) retombent EXACTEMENT sur
+l'optimum certifié (6 cycles, 0 trou, isoadj 18). L'invariance à la
+découpe est acquise sur la famille banc. La méthode
+optimum-construit→découpes→reconstruction a désigné et calé le terme
+en une itération. Suivant : brancher la forme des nœuds côté faust
+(symbole de l'op du Tree) dans csschedule, et re-passer vocoder.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.

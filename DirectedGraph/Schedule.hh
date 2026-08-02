@@ -436,6 +436,253 @@ inline schedule<N> mcschedule(const digraph<N>& G, unsigned int R, unsigned int 
  * @param U the issue width (v1: the stall term models its effect)
  * @return schedule<N> a valid schedule of G
  */
+/**
+ * @brief Quality vector of a schedule on the (R, U) abstract machine:
+ * cycles and holes from a greedy packing under unit latency, register
+ * over-pressure, and the count of ADJACENT ISOMORPHIC INDEPENDENT pairs
+ * (the superword-vectorization opportunities: same shape, no dependency).
+ * The shape of a node is given by the optional functor (nullptr: every
+ * node has its own shape, isoadj is then always 0).
+ */
+struct schedquality {
+    int  cycles = 0;
+    int  holes  = 0;
+    int  peak   = 0;
+    long over   = 0;
+    int  isoadj = 0;
+};
+
+template <typename N>
+inline schedquality squality(const digraph<N>& G, const std::vector<N>& S, unsigned int R,
+                             unsigned int U, std::function<long(const N&)> shape = nullptr)
+{
+    schedquality q;
+    digraph<N>   Rg = reverse(G);
+    std::map<N, int> cyc, pending;
+    for (const N& n : S) {
+        pending[n] = int(Rg.destinations(n).size());
+    }
+    int cur = 0, slots = 0, live = 0;
+    for (size_t i = 0; i < S.size(); i++) {
+        const N& n  = S[i];
+        int      lo = 0;
+        for (const auto& d : G.destinations(n)) {
+            auto it = cyc.find(d.first);
+            if (it != cyc.end()) {
+                lo = std::max(lo, it->second + 1);
+            }
+        }
+        if (lo > cur) {
+            q.holes += (lo - cur) * int(U) - slots;
+            cur   = lo;
+            slots = 0;
+        } else if (slots == int(U)) {
+            cur++;
+            slots = 0;
+        }
+        cyc[n] = cur;
+        slots++;
+        if (pending[n] > 0) {
+            live++;
+        }
+        for (const auto& d : G.destinations(n)) {
+            if (--pending[d.first] == 0) {
+                live--;
+            }
+        }
+        q.peak = std::max(q.peak, live);
+        q.over += std::max(0, live - int(R));
+        if (i > 0 && shape != nullptr && shape(S[i - 1]) == shape(n)) {
+            bool dep = false;
+            for (const auto& d : G.destinations(n)) {
+                if (d.first == S[i - 1]) {
+                    dep = true;
+                }
+            }
+            if (!dep) {
+                q.isoadj++;
+            }
+        }
+    }
+    q.cycles = cur + 1;
+    q.holes += int(U) - slots;
+    return q;
+}
+
+/**
+ * @brief Optimal-ish pairwise interleaving of two sequences over G under R
+ * -- the COMBINE at the heart of compositional scheduling. Both internal
+ * orders are preserved; cross-dependencies are respected; the DP minimizes
+ *   BIG * over-pressure + stalls + iso-misses
+ * where a stall places a node right after one of its operands and an
+ * iso-miss is an adjacency that could have been isomorphic-independent
+ * (rewarding superword opportunities) when a shape functor is given.
+ * Ties prefer staying on the same sequence (locality by default).
+ */
+template <typename N>
+inline std::vector<N> dpcombine(const digraph<N>& G, const digraph<N>& Rg, std::vector<N> A,
+                                std::vector<N> B, unsigned int R,
+                                std::function<long(const N&)> shape = nullptr)
+{
+    const int na = int(A.size()), nb = int(B.size());
+    if (na == 0) {
+        return B;
+    }
+    if (nb == 0) {
+        return A;
+    }
+    if (long(na + 1) * long(nb + 1) > 4000000L) {
+        std::vector<N> cat = A;
+        cat.insert(cat.end(), B.begin(), B.end());
+        return cat;
+    }
+    auto consumers = [&](const N& n) -> const auto& { return Rg.destinations(n); };
+    std::map<N, int> pA, pB;
+    for (int i = 0; i < na; i++) {
+        pA[A[i]] = i;
+    }
+    for (int j = 0; j < nb; j++) {
+        pB[B[j]] = j;
+    }
+    std::vector<int> minI(nb, 0);
+    for (int j = 0; j < nb; j++) {
+        int need = (j > 0) ? minI[j - 1] : 0;
+        for (const auto& d : G.destinations(B[j])) {
+            auto it = pA.find(d.first);
+            if (it != pA.end() && it->second + 1 > need) {
+                need = it->second + 1;
+            }
+        }
+        minI[j] = need;
+    }
+    std::map<N, int>  lastA, lastB;
+    std::map<N, bool> ext;
+    auto scan = [&](const N& x) {
+        int la = -1, lb = -1;
+        bool e = false;
+        for (const auto& c : consumers(x)) {
+            auto ia = pA.find(c.first);
+            auto ib = pB.find(c.first);
+            if (ia != pA.end()) {
+                la = std::max(la, ia->second);
+            } else if (ib != pB.end()) {
+                lb = std::max(lb, ib->second);
+            } else {
+                e = true;
+            }
+        }
+        lastA[x] = la;
+        lastB[x] = lb;
+        ext[x]   = e;
+    };
+    for (const N& x : A) {
+        scan(x);
+    }
+    for (const N& x : B) {
+        scan(x);
+    }
+    std::vector<std::vector<int>> dieA(na), dieB(nb);
+    auto put = [&](const N& x, int u) {
+        int la = lastA[x], lb = lastB[x];
+        if (ext[x] || (la < 0 && lb < 0)) {
+            return;
+        }
+        if (lb < 0) {
+            dieA[la].push_back(u);
+        } else if (la < 0) {
+            dieB[lb].push_back(u);
+        } else {
+            dieA[la].push_back(u);
+        }
+    };
+    for (int i = 0; i < na; i++) {
+        put(A[i], i);
+    }
+    for (int j = 0; j < nb; j++) {
+        put(B[j], na + j);
+    }
+    auto liveAfter = [&](const N& u) { return ext[u] || lastA[u] >= 0 || lastB[u] >= 0; };
+    auto dependsOn = [&](const N& u, const N& v) {
+        for (const auto& d : G.destinations(u)) {
+            if (d.first == v) {
+                return true;
+            }
+        }
+        return false;
+    };
+    const long PBIG = 1000000L, STALL = 3, ISOMISS = 2;
+    const int  W    = nb + 1;
+    const long INF  = LONG_MAX / 4;
+    std::vector<long> cost(size_t(na + 1) * W * 2, INF);
+    std::vector<int>  live(size_t(na + 1) * W * 2, 0);
+    std::vector<char> par(size_t(na + 1) * W * 2, 0);
+    auto id = [&](int i, int j, int s) { return (size_t(i) * W + j) * 2 + s; };
+    cost[id(0, 0, 0)] = 0;
+    for (int i = 0; i <= na; i++) {
+        for (int j = 0; j <= nb; j++) {
+            for (int s = 0; s < 2; s++) {
+                long c0 = cost[id(i, j, s)];
+                if (c0 >= INF) {
+                    continue;
+                }
+                int      l0   = live[id(i, j, s)];
+                const N* prev = nullptr;
+                if (i + j > 0) {
+                    prev = (s == 0) ? (i > 0 ? &A[i - 1] : nullptr)
+                                    : (j > 0 ? &B[j - 1] : nullptr);
+                }
+                auto relax = [&](int ni, int nj, int ns, const N& u,
+                                 const std::vector<int>& dies, int guardJ) {
+                    int l = l0 + (liveAfter(u) ? 1 : 0);
+                    for (int x : dies) {
+                        int lbx = lastB[(x < na) ? A[x] : B[x - na]];
+                        if (lbx < 0 || lbx <= guardJ) {
+                            l--;
+                        }
+                    }
+                    long pen = PBIG * std::max(0, l - int(R));
+                    if (prev != nullptr) {
+                        if (dependsOn(u, *prev)) {
+                            pen += STALL;
+                        } else if (shape != nullptr && shape(u) != shape(*prev)) {
+                            pen += ISOMISS;
+                        }
+                    }
+                    long   c    = c0 + pen;
+                    size_t k    = id(ni, nj, ns);
+                    bool   same = (ns == s);
+                    if (c < cost[k] || (c == cost[k] && same && par[k] == 0)) {
+                        cost[k] = c;
+                        live[k] = l;
+                        par[k]  = char(s + 1);
+                    }
+                };
+                if (i < na) {
+                    relax(i + 1, j, 0, A[i], dieA[i], j - 1);
+                }
+                if (j < nb && minI[j] <= i) {
+                    relax(i, j + 1, 1, B[j], dieB[j], j);
+                }
+            }
+        }
+    }
+    int sEnd = (cost[id(na, nb, 0)] <= cost[id(na, nb, 1)]) ? 0 : 1;
+    std::vector<N> merged;
+    merged.reserve(na + nb);
+    int i = na, j = nb, sc = sEnd;
+    while (i > 0 || j > 0) {
+        char p = par[id(i, j, sc)];
+        if (sc == 0) {
+            merged.push_back(A[--i]);
+        } else {
+            merged.push_back(B[--j]);
+        }
+        sc = (p == 1) ? 0 : (p == 2) ? 1 : sc;
+    }
+    std::reverse(merged.begin(), merged.end());
+    return merged;
+}
+
 template <typename N>
 inline schedule<N> csschedule(const digraph<N>& G, unsigned int R, unsigned int U)
 {

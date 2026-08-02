@@ -1513,3 +1513,101 @@ bool check30()
 
     return reportCheck(30, ok);
 }
+
+// ---------------------------------------------------------------------------
+// The combine calibration bench (branch combine-lab). Certified optima are
+// BUILT as filled U x cycles grids, the dependency DAG is induced from the
+// grid, the optimum is cut into sub-expression pieces, and the combine must
+// fall back onto the optimum's quality -- for every cut. The scoreboard
+// prints the quality vectors; the assertions hold only what the current
+// combine is expected to achieve (validity, and the green families).
+// ---------------------------------------------------------------------------
+
+// family: k isomorphic chains of depth d (a bank). Node id = c*1000 + t.
+// Certified optimum (U = k): level-major order -- zero holes, peak k,
+// max iso-adjacency. Shapes: the stage t (chains are isomorphic).
+static void bankgraph(int k, int d, digraph<int>& g, std::vector<int>& optimum)
+{
+    for (int c = 0; c < k; c++) {
+        for (int t = 1; t < d; t++) {
+            g.add(c * 1000 + t, c * 1000 + t - 1);
+        }
+    }
+    for (int t = 0; t < d; t++) {
+        for (int c = 0; c < k; c++) {
+            optimum.push_back(c * 1000 + t);
+        }
+    }
+}
+static long bankshape(const int& n)
+{
+    return n % 1000;  // the stage: chains are isomorphic
+}
+
+// reconstruct by folding the pieces with dpcombine
+static std::vector<int> refold(const digraph<int>& g,
+                               const std::vector<std::vector<int>>& pieces, unsigned R,
+                               bool iso)
+{
+    digraph<int>     rg = reverse(g);
+    std::vector<int> acc;
+    std::function<long(const int&)> sh = iso ? bankshape : std::function<long(const int&)>();
+    for (const auto& p : pieces) {
+        acc = dpcombine(g, rg, std::move(acc), p, R, sh);
+    }
+    return acc;
+}
+
+bool check31()
+{
+    bool ok = true;
+    const int k = 4, d = 6;
+    const unsigned U = 4;
+
+    digraph<int>     bank;
+    std::vector<int> opt;
+    bankgraph(k, d, bank, opt);
+    auto qopt = squality(bank, opt, unsigned(k), U, std::function<long(const int&)>(bankshape));
+    std::cout << "combine-lab  bank(4,6)  optimum: cycles " << qopt.cycles << " holes "
+              << qopt.holes << " peak " << qopt.peak << " isoadj " << qopt.isoadj << '\n';
+
+    // cuts of the same optimum
+    std::map<std::string, std::vector<std::vector<int>>> cuts;
+    for (int c = 0; c < k; c++) {  // by chain (the natural sub-expressions)
+        std::vector<int> piece;
+        for (int t = 0; t < d; t++) {
+            piece.push_back(c * 1000 + t);
+        }
+        cuts["chains"].push_back(piece);
+    }
+    for (int t = 0; t < d; t++) {  // by level (the anti-cut)
+        std::vector<int> piece;
+        for (int c = 0; c < k; c++) {
+            piece.push_back(c * 1000 + t);
+        }
+        cuts["levels"].push_back(piece);
+    }
+    {  // halves of the optimum sequence
+        std::vector<int> h1(opt.begin(), opt.begin() + int(opt.size()) / 2);
+        std::vector<int> h2(opt.begin() + int(opt.size()) / 2, opt.end());
+        cuts["halves"] = {h1, h2};
+    }
+
+    for (bool iso : {false, true}) {
+        for (const auto& [name, pieces] : cuts) {
+            auto rec = refold(bank, pieces, k, iso);
+            schedule<int> S;
+            for (int n : rec) {
+                S.append(n);
+            }
+            bool valid = isValidSchedule(bank, S);
+            auto q     = squality(bank, rec, unsigned(k), U, std::function<long(const int&)>(bankshape));
+            std::cout << "combine-lab  bank(4,6)  cut " << name << (iso ? " +iso" : "     ")
+                      << " : cycles " << q.cycles << " holes " << q.holes << " peak "
+                      << q.peak << " isoadj " << q.isoadj << (valid ? "" : "  INVALID")
+                      << '\n';
+            ok = ok && valid;
+        }
+    }
+    return reportCheck(31, ok);
+}
