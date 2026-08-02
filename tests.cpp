@@ -1758,3 +1758,126 @@ bool check32()
     }
     return reportCheck(32, ok);
 }
+
+// Hardened families (the fill campaign, 2026-08-03) : the easy bank was
+// solved in one iteration, but the real judge (vocoder) shows a FILL
+// deficit (40-46 % vs 88-99 % for bf). These families reproduce, one trait
+// at a time, what separates vocoder from bank(4,6) : stages that are
+// BLOCKS of ops, and width far beyond R (the optimum must tile).
+// Scoreboard first : validity asserted, quality printed.
+
+// stage-blocks : k chains of d stages, each stage a chain of b ops.
+// Node id = c*100000 + t*100 + j. Shape = position in the chain (t*100+j) :
+// homologous ops across chains are isomorphic.
+static void bankblocks(int k, int d, int b, digraph<int>& g, std::vector<int>& optimum)
+{
+    auto id = [](int c, int t, int j) { return c * 100000 + t * 100 + j; };
+    for (int c = 0; c < k; c++) {
+        for (int t = 0; t < d; t++) {
+            for (int j = 0; j < b; j++) {
+                if (j > 0) {
+                    g.add(id(c, t, j), id(c, t, j - 1));
+                } else if (t > 0) {
+                    g.add(id(c, t, 0), id(c, t - 1, b - 1));
+                } else {
+                    g.add(id(c, t, 0));
+                }
+            }
+        }
+    }
+    for (int t = 0; t < d; t++) {
+        for (int j = 0; j < b; j++) {
+            for (int c = 0; c < k; c++) {
+                optimum.push_back(id(c, t, j));
+            }
+        }
+    }
+}
+static long blockshape(const int& n)
+{
+    return n % 100000;  // (stage, position) : chains are isomorphic
+}
+
+bool check33()
+{
+    bool ok = true;
+
+    auto report = [&](const char* name, const digraph<int>& g, const std::vector<int>& s,
+                      unsigned R, unsigned U, std::function<long(const int&)> sh) {
+        schedule<int> S;
+        for (int n : s) {
+            S.append(n);
+        }
+        bool valid = isValidSchedule(g, S);
+        auto q     = squality(g, s, R, U, sh);
+        int  fill  = int(100.0 * double(s.size()) / (double(q.cycles) * U));
+        std::cout << "combine-lab  " << name << " : cycles " << q.cycles << " fill " << fill
+                  << "% peak " << q.peak << " isoadj " << q.isoadj
+                  << (valid ? "" : "  INVALID") << '\n';
+        ok = ok && valid;
+        return fill;
+    };
+
+    // ---- stage-blocks : 4 chains x 4 stages x 4 ops, U = 4
+    {
+        const int k = 4, d = 4, b = 4;
+        digraph<int>     g;
+        std::vector<int> opt;
+        bankblocks(k, d, b, g, opt);
+        auto sh = std::function<long(const int&)>(blockshape);
+        report("blocs(4,4,4) optimum   ", g, opt, k, 4, sh);
+        digraph<int>                  rg = reverse(g);
+        std::vector<std::vector<int>> chains;
+        for (int c = 0; c < k; c++) {
+            std::vector<int> p;
+            for (int t = 0; t < d; t++) {
+                for (int j = 0; j < b; j++) {
+                    p.push_back(c * 100000 + t * 100 + j);
+                }
+            }
+            chains.push_back(p);
+        }
+        std::vector<int> acc;
+        for (auto& p : chains) {
+            acc = dpcombine(g, rg, std::move(acc), p, k, sh);
+        }
+        report("blocs(4,4,4) refold    ", g, acc, k, 4, sh);
+    }
+
+    // ---- wide : 16 chains of depth 6, R = 4 (l'optimum doit TUILER)
+    {
+        const int k = 16, d = 6;
+        const unsigned R = 4, U = 4;
+        digraph<int>     g;
+        std::vector<int> opt;
+        // tiles de R chaînes, niveau-major dans la tuile
+        for (int c = 0; c < k; c++) {
+            for (int t = 1; t < d; t++) {
+                g.add(c * 1000 + t, c * 1000 + t - 1);
+            }
+        }
+        for (int tile = 0; tile < k / int(R); tile++) {
+            for (int t = 0; t < d; t++) {
+                for (int c = tile * R; c < (tile + 1) * int(R); c++) {
+                    opt.push_back(c * 1000 + t);
+                }
+            }
+        }
+        auto sh = std::function<long(const int&)>(bankshape);
+        report("large(16,6,R4) optimum ", g, opt, R, U, sh);
+        digraph<int>                  rg = reverse(g);
+        std::vector<int>              acc;
+        for (int c = 0; c < k; c++) {
+            std::vector<int> p;
+            for (int t = 0; t < d; t++) {
+                p.push_back(c * 1000 + t);
+            }
+            acc = dpcombine(g, rg, std::move(acc), p, R, sh);
+        }
+        report("large(16,6,R4) refold  ", g, acc, R, U, sh);
+        // csschedule direct : son foldChildren a le round-robin par lots
+        auto cs = csschedule(g, R, U, sh);
+        report("large(16,6,R4) cs      ", g, cs.elements(), R, U, sh);
+    }
+    return reportCheck(33, ok);
+}
