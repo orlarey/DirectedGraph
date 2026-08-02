@@ -351,6 +351,21 @@ travers le graphe = le mouvement BANK proprement dit, dont shape()
 est désormais la primitive de reconnaissance. C'est le prochain
 chantier de fond, avec la re-campagne v6 sur le corpus.
 
+### 2026-08-04 — statistiques de formes : le gisement Bank est quantifié
+
+FAUST_SS_SHAPES (avec un correctif de grain décisif : les opcodes de
+binop restent LITTÉRAUX dans la forme — un sélecteur d'opération n'est
+pas une donnée, mul et add ne partagent pas de forme). Sur le corpus :
+**84-95 % des nœuds ordonnancés vivent dans des formes de multiplicité
+≥ 4** (le seuil de packing SLP) presque partout — echo 48 % (trop
+petit), jprev dégénéré (2048 de ses 2049 nœuds sont le contenu entier
+d'une waveform explosée dans le graphe : à regarder en soi). vocoder :
+469 mul, 261 lectures de délai, 225 add, 164 div — des bancs de
+centaines d'instances. Nuance : c'est une borne SUPÉRIEURE (les
+instances d'une forme peuvent dépendre entre elles) ; le raffinement
+suivant = tailles de bancs ajustées par indépendance (antichaînes par
+classe de forme). Le mouvement Bank a sa matière première mesurée.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
