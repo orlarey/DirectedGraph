@@ -84,6 +84,30 @@ superlinéaire. À profiler, puis borner ou réécrire.
   20 au grain op du moteur -ls). Coût de compilation : ~3 s sur
   fdnRev (le O(V·cycles) de v1), à surveiller sur les costly.
 
+### 2026-08-02 (après-midi) — l'hypothèse (R, U), réfutée avec profit
+
+Hypothèse (Yann) : pour tout programme scalaire il existe (R, U) tel
+que mc bat ou égale la meilleure stratégie fixe. Campagne : corpus
+des 22, baseline fraîche des 5 fixes + grille 10 R × 3 U, 3 tours
+alternés (`campaign-mcgrid-20260802` dans loop-splitting/measures).
+
+**Réfutée : 5/22** (geomean meilleur-mc/meilleure-fixe 1.580) — mais
+le motif d'échec identifie la dimension manquante. mc gagne toute la
+classe sous pression (bowedString 0.796, karplus32 0.850, dbmeter
+0.866, fdnRev 0.986) ; il échoue ailleurs avec 9/17 optima collés au
+bord R=40 : son extrême-largeur ne retrouve pas bf, car le modèle
+(R, U) ne voit pas la **localité** (bf groupe les niveaux, df les
+expressions ; la proximité des opérandes est invisible à la vivacité
+— c'est le `schedulingcost` de la librairie). Pire cas : vocoder
+×6.6, le plus grand gagnant d'ordre du corpus (bf ×0.28), dispersé
+par mc.
+
+Hypothèse v2 au tableau : (a) départage des ex-æquo par RÉCENCE des
+opérandes (remplace l'ancrage df, gratuit) ; (b) hybride
+mc-dans-les-niveaux (l'ordre bf, la police (R, U) dedans). Aussi :
+l'enveloppe fixes+mc vaut 0.803 vs df — la sélection par programme
+reste le gisement (~20 %).
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
