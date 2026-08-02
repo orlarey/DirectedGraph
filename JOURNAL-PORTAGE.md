@@ -285,6 +285,24 @@ grain des groupes) : une option qui commute un mode en réglant un
 paramètre est un piège de mesure — et « attribuer exige d'ablater »
 vaut aussi pour ses propres options.
 
+### 2026-08-03 (soir) — mcgrid2 : l'hypothèse jugée sur pièces, 14/22
+
+Campagne propre (garde anti-contamination : zéro rejet). **14/22
+confirmés** à ≤1.02, 11 victoires nettes — clarinet cs R1U4 : −8.7 %
+sous le meilleur fixe ; violin, paradigma, karplus32, filterBank,
+churchOrgan, freeverb (le réfractaire, battu par mc R40), dbmeter.
+cs bat mc 13 duels à 9 : le compositionnel (dominance + iso au grain
+instruction) ajoute au spectre pur. Geomean meilleur-grille /
+meilleure-fixe : 1.053. Les 8 échecs = la classe bf/rb (SLP) :
+vocoder 2.64 (l'iso-terme fait la moitié du chemin depuis df 4.08,
+bf 1.35 garde l'avance de régularité totale), bells 1.19, brass 1.16,
+insects 1.14. R optima étalés de 1 à 40 : la sélection par programme
+reste le gisement (enveloppe totale 0.820 vs df).
+
+Suites : durcir les familles bank du banc (le résidu SLP du combine),
+pondération de l'iso-terme, et la sélection (stratégie, R, U) par
+programme jugée compute_stack.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
