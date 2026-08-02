@@ -108,6 +108,34 @@ mc-dans-les-niveaux (l'ordre bf, la police (R, U) dedans). Aussi :
 l'enveloppe fixes+mc vaut 0.803 vs df — la sélection par programme
 reste le gisement (~20 %).
 
+### 2026-08-02 (soir) — la localité décomposée, v2a réfutée
+
+L'anecdote (rapportée par Yann) : historiquement l'ordre de
+DÉCLARATION des champs de la classe DSP suivait le deep-first, et un
+reclassement des champs avait fortement dégradé les performances.
+Reproduite et quantifiée sur vocoder : trier les 205 déclarations
+coûte **+69 % à bf** (1.136 → 1.925 ms) à ordre d'instructions
+identique — la disposition mémoire des états est un effet de premier
+ordre, et elle SUIT l'ordre d'émission (réparer l'ordre répare les
+deux). df trié : +1.7 % seulement ; mc trié : neutre (son layout est
+déjà dispersé, et son ordre d'instructions reste 4x derrière un bf
+saboté — mc a les deux problèmes sur vocoder).
+
+v2a (récence des opérandes en DÉPARTAGE des deux régimes) : essayée,
+**réfutée par A/B même session** — elle régresse le meilleur gagnant
+de la classe pression (bowedString R8U1 : 5.82 → 6.47, +11 %) pour
+des gains marginaux sur les échecs (vocoder −5 %, insects −3 %). Le
+départage perturbe les ordres du régime-libération qui font gagner
+mc. Revert : Schedule.hh reste en v1.
+
+Leçon pour v2b : la localité ne peut pas être un critère SECONDAIRE
+du même parcours — c'est une STRUCTURE (les niveaux de bf, les
+groupes d'expressions de df) dans laquelle la police (R, U) doit
+travailler. Candidat suivant : mc-dans-les-niveaux (l'ordre des
+niveaux de bf conservé, la police (R, U) appliquée à l'intérieur de
+chaque niveau), qui hérite du layout-balayage de bf par
+construction.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
