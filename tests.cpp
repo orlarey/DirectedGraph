@@ -1878,6 +1878,9 @@ bool check33()
         // csschedule direct : son foldChildren a le round-robin par lots
         auto cs = csschedule(g, R, U, sh);
         report("large(16,6,R4) cs      ", g, cs.elements(), R, U, sh);
+        // alignement par formes : les rangs monochromes doivent émerger
+        auto al = alignschedule(g, sh);
+        report("large(16,6,R4) align   ", g, al.elements(), R, U, sh);
     }
     return reportCheck(33, ok);
 }
