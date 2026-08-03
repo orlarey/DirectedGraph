@@ -464,3 +464,35 @@ de comparer sonde interactive et campagne script sur un nom ambigu.
 couche » a joué : le correctif envisagé (graph2dag systématique)
 n'était dérivable d'aucun contrat violé — et pour cause, rien n'était
 violé. L'objection de construction de Yann valait toutes les sondes.
+
+## 2026-08-03 (midi) — bankschedule : l'opposition align/cs dissoute en une famille
+
+Yann : « je ne comprends pas pourquoi on oppose les deux... toutes les
+compositions se font sous contrainte, simplement on le fait à partir
+d'un DAG préalablement aligné. » C'était sa formulation d'origine, que
+l'implémentation avait trahie en faisant de l'alignement une stratégie
+terminale. bankschedule (-ss 9) la rétablit :
+
+A. alignement comme ANALYSE : mobilités + rangs cibles (plus d'ordre) ;
+B. légalisation (chaque arête croît strictement en rang → bancs
+   antichaînes, quotient acyclique PAR CONSTRUCTION — aucune passe de
+   vérification) puis condensation en bancs plafonnés ;
+C. csschedule sur le DAG des bancs : la composition décide OÙ vont les
+   bancs, plus jamais s'ils existent.
+
+check34 : les deux couronnes miniatures d'un coup — blocs(4,4,4) =
+align = optimum ; large(16,6,R4) = cs = optimum certifié, le tuilage R
+émergeant de la composition une fois les unités de pression converties
+(Rb = R/cap, approximation uniforme).
+
+Sur les vrais juges (bit-exacts, 0 violation SS_CHECK) : le plafond de
+bancs optimal SUIT R — karplus32 : cap 8 = son R, 1.320 contre cs
+1.272 ; vocoder : cap 32, 1.174 contre bf 1.158 (l'align pur : 1.165).
+cap > R détruit karplus (la rafale déborde le budget de registres),
+cap < 32 détruit vocoder (les rafales monochromes hachées). Lecture :
+R petit = pôle localité (cs), R grand = pôle rafales (align) — les
+deux stratégies rivales sont devenues UNE famille à un paramètre, à
+quasi-parité aux deux pôles. Écart résiduel (+1.4 à +3.7 %) : le prix
+de l'approximation uniforme Rb ; le raffinement identifié est la
+pression PONDÉRÉE par la taille des bancs dans l'étape C (dpcombine et
+le tourniquet comptant des valeurs, pas des bancs).
