@@ -424,3 +424,43 @@ stable » : il faut que la rupture de cycles d'alignschedule soit
 ALIGNÉE sur celle de l'émission (mêmes arêtes arrière), pas seulement
 déterministe. Piste : hériter les points de rupture de l'ancre df au
 lieu de les redécouvrir en panne sèche.
+
+## 2026-08-03 (suite) — rectificatif : il n'y avait pas de bug, il y avait deux find
+
+L'entrée précédente annonçait un « tirage rare divergent »
+d'alignschedule. Yann a objecté qu'un cycle à zéro est impossible par
+construction dans Faust (retard ≥ 1 dans toute boucle récursive) —
+et l'objection a tout démonté, dans l'ordre :
+
+1. Sonde SS_CHECK (nouvelle instrumentation faust) : le graphe
+   immédiat est un DAG sur TOUT le corpus (sccs>1 = 0 partout — les
+   arêtes de retard dmin ≥ 1 ne sont jamais ajoutées par
+   sigDependenciesGraph). Les chemins « cycles » de Schedule.hh ne se
+   déclenchent donc jamais sur les vrais programmes.
+2. Les 12 tirages contrôlés d'alignschedule sont tous des ordres
+   topologiquement valides (0 violation d'arête).
+3. L'artefact « divergent » de la campagne : 1288 lignes, tampons de
+   16384 — ce n'était pas un autre ordre, c'était UN AUTRE PROGRAMME.
+   Le corpus a des homonymes (3 clarinet.dsp, 2 bells, 3 brass,
+   2 karplus32) et la résolution `find | head -1` du pilote ne choisit
+   pas le même fichier selon le contexte : dans les scripts zsh c'est
+   /usr/bin/find (ordre readdir, faust-stk/clarinet en tête) ; dans
+   les sondes interactives c'est une fonction shell du harnais
+   (physicalModeling/clarinet en tête). La « divergence » comparait
+   faust-stk/clarinet à la référence df de physicalModeling/clarinet.
+   Preuve par recoupement : tous les programmes sans homonyme
+   concordent entre contextes (dbmeter 1.242/1.242), tous les
+   homonymes divergent.
+
+Conclusions. (a) Aucun bug de correction : 32 générations de
+physicalModeling/clarinet toutes bit-exactes à 0.370–0.378, le ×4.8
+tient. (b) Le non-déterminisme d'alignschedule (6 md5 sur 20) reste
+réel mais n'a montré aucun coût : dossier performance, plus urgence.
+(c) La ligne clarinet des campagnes scriptées = faust-stk/clarinet
+(align 0.899, honorable) — programme distinct du record interactif.
+(d) Hygiène : corpus par CHEMINS EXPLICITES désormais ; interdiction
+de comparer sonde interactive et campagne script sur un nom ambigu.
+(e) La doctrine « un fix doit être dérivable du contrat de sa
+couche » a joué : le correctif envisagé (graph2dag systématique)
+n'était dérivable d'aucun contrat violé — et pour cause, rien n'était
+violé. L'objection de construction de Yann valait toutes les sondes.
