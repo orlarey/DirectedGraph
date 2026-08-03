@@ -734,3 +734,20 @@ appartient à la TROISIÈME RESSOURCE (les flux de cache), absente du
 modèle. Le modèle complet visé : II = max(calcul/U, mémoire/M,
 récurrence, flux/S) — recMII choisit le régime, S choisira le cap.
 C'est la première pierre du chantier post-renouvellement.
+
+## 2026-08-03 (épilogue) — le paysage du cap : pas de falaise, des résonances
+
+Balayage fin du cap sur les trois denses-en-retards (R8U4 fixe) :
+karplus c2=1.35 c4=3.34 c6=3.19 c8=1.25* c12=5.59 c16=5.21 ;
+fbell c8=1.90* seul bon (tout le reste 3.0-3.8) ; bells c4=1.41*
+c2=2.66 c8=1.88. Des OPTIMA ISOLÉS ET POINTUS, non monotones,
+propres à chaque programme — pas une saturation de budget de flux
+mais une RÉSONANCE entre le cap et la structure fine (largeurs de
+familles, raggedness des sous-bancs, seuil SLP). Conséquence : les
+deux réfutations de la soirée étaient inévitables — aucune loi
+statique lisse n'existe. Doctrine v2 : le cap se choisit par
+MINI-AUTOTUNING (5 candidats × 0.3 s de bench, moins cher qu'une
+erreur de cap) ; la compréhension mécanique attend les compteurs
+matériels. Le modèle à ressources garde ses deux étages sains :
+recMII choisit le régime (validé : zita, jprev exacts), l'autotuning
+choisira le cap.
