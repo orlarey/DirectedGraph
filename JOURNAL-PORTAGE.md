@@ -619,3 +619,45 @@ deps-first à ces échelles — la localité inter-boucles est déjà servie.
 Le câblage reste comme instrumentation (partitions plus fines à
 venir). Le levier réel demeure INTRA-boucle — où -ls-sched n'a que
 df/bf/model et ignore tout des découvertes du jour (phase, modes).
+
+## 2026-08-03 (17h) — question de Yann sur l'ouverture des boucles longues : audit complet
+
+« Quand on ouvre les boucles récursives longues > vector-size,
+tient-on compte de l'ordre producteur/consommateur, car il faut
+corriger les accès aux lignes à retard et les allonger ? »
+
+L'audit répond en trois pièces, qui s'alignent :
+1. SEUIL : la partition d'émission est construite avec
+   freeDelayThreshold = gVecSize — seules les lectures certifiées
+   dmin >= chunk perdent leur arête d'ordre (elles ne touchent que
+   les chunks précédents).
+2. ANNEAUX : taillés sz >= maxD + vs (PAS le pow2limit(maxD+1) du
+   classique où IOTA avance par échantillon) — les 32 écritures d'un
+   chunk ne peuvent jamais rattraper l'historique lu, quel que soit
+   l'ordre des blocs.
+3. LINÉAIRE : tampon vs + maxD, écritures au suffixe, lectures libres
+   au préfixe — séparation structurelle.
+La conception répond par l'INDÉPENDANCE D'ORDRE PAR CONSTRUCTION
+(les deux ordres sont sûrs) plutôt que par correction des accès selon
+l'ordre choisi. Preuve adversariale : FAUST_LS_ORDER=rb (ordre des
+blocs RENVERSÉ, consommateurs libres avant producteurs) est bit-exact
+contre l'émission classique sur reverbTank, zitaRev, fdnRev, vocalFOF
+et karplus32.
+
+En chemin, la même séance a débusqué et corrigé le vrai trou (voisin
+mais distinct) : les lectures d0 via tampon des TAPS ALIASÉS à
+décalage nul n'avaient pas d'arête RAW vers le store de leur hôte —
+df survivait par coïncidence d'ordre de création, model lisait des
+cases périmées (zitaRev divergent dès l'échantillon 33, reverbTank en
+résidu 1e-10). Corrigé dans refOperand (lecture enveloppée dans un op
+dépendant de fStoreOf[hôte]) ; les trois ordres intra-boucle sont
+bit-exacts contre le classique, et le correctif AMÉLIORE les temps :
+reverbTank fuse-model 5.16 → 4.58 ms, frenchBell fuse-model
+1.46 → 1.30 ms (meilleur frenchBell jamais mesuré, 0.36 du classique)
+— model optimisait avec une liberté illégale, et l'alias lu une fois
+en registre remplace les relectures du tampon.
+
+Et le croisement -ls-sched layers : résultat NÉGATIF documenté —
+les corps de boucles sont en régime de vectorisation de boucle
+(sur i), pas SLP ; la monnaie de phase du grain Tree ne s'y transfère
+pas. model reste le bon outil intra-boucle.
