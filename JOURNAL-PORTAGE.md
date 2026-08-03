@@ -600,3 +600,22 @@ L'adaptativité par région reste la cible architecturale ; en
 attendant, la sélection empirique par programme (3-4 modes générés,
 départagés à l'oracle + mini-bench) est déployable. Tout est commité
 et synchronisé (standalone + tlib + signals + faust, banc vert).
+
+## 2026-08-03 (16h) — l'ordre du DAG des super-nœuds : question de Yann, verdict mesuré
+
+« Notre dag de super-nœuds doit lui-même être schedulé. Quelle
+stratégie on emploie actuellement ? » — Réponse : AUCUNE, par
+accident. La numérotation des blocs suit le parcours de la partition,
+puis retopo() renumérote par un Kahn à pile LIFO (tendance df) que
+personne n'a choisi, et l'émission suit les indices. Câblé sous
+FAUST_LS_ORDER : le quotient passe par la librairie (df/bf/rb/sp).
+
+Verdict expérimental : PAS un levier aujourd'hui. kahn ≈ df ≈ bf au
+bruit près sur reverbTank (11 boucles), vocalBP (14), 2dKirchhoff (5),
+zitaRev (5), fdnRev (20) et même vocalFOF (140 boucles) ; seul l'ordre
+adversarial rb coûte (+12 % reverbTank). Interprétation : les tampons
+inter-boucles (count + délais) tiennent en L1 quel que soit l'ordre
+deps-first à ces échelles — la localité inter-boucles est déjà servie.
+Le câblage reste comme instrumentation (partitions plus fines à
+venir). Le levier réel demeure INTRA-boucle — où -ls-sched n'a que
+df/bf/model et ignore tout des découvertes du jour (phase, modes).
