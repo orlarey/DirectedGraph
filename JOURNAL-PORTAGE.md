@@ -669,3 +669,33 @@ les programmes améliorés ou stables (piano1 0.98→0.91, reverbTank
 0.98→0.93, pluckedString 1.51→1.32, vocalBPMIDI 0.79), geomean
 enveloppe-ls/classique 1.073 → 1.030. Le bug des alias ne coûtait pas
 que la correction : il coûtait de la performance partout.
+
+## 2026-08-03 (nuit) — le modèle à ressources de Yann : bornes calibrées, sélecteur en vue
+
+Proposition de Yann : la bande passante mémoire est une ressource ;
+un modèle de contraintes approximatif ne peut fonder une stratégie
+optimale ; faut-il un paramètre d'E/S simultanées ? Réponse en trois
+implémentations (toutes committées, banc vert) :
+
+1. Machine à DEUX ressources dans squality (U slots calcul, M ports
+   mémoire, classif des nœuds Tree) — le cadre modulo-scheduling
+   II = max(ResMII par ressource, RecMII) [Lam 88, Rau 94] ; roofline
+   et decoupled access/execute cités au dossier.
+2. Coûts calibrés par op (mul/add 3, load 4, div 10, libm 25). Le
+   chemin critique pondéré du squelette complet s'est révélé
+   NON-discriminant (les épines feed-forward se recouvrent d'un
+   échantillon à l'autre — seuls les nids serrés bornent).
+3. recMII = profondeur pondérée des nids de récurrence à distance 1
+   (cut(fullGraph, 2)). LE CLASSEMENT REJOUE LA CARTE DES CAMPAGNES :
+   recMII >= 50 (clarstk/brass/zita 112, fdnRev 193, violin 67,
+   bowedS 53) = jeu de localité, gagnants cs/align-compact ;
+   recMII <= 34 (vocoder/fbell/karplus 19, bellsit 34) = jeu de
+   débit, gagnants bf/align/rafales (fbell -47 %).
+
+Candidat sélecteur statique pour l'adaptativité de l'étape C :
+recMII/aluMII. Limites connues : précision d'intervalle sur les
+minima de retard (fdnRev : certificats dmin=1 pour des lignes de
+~100), et karplus dont l'affinité localité vient du cache (3e
+ressource, flux) et non de la récurrence. Prochaine marche : brancher
+le sélecteur dans bankschedule (régime par région), et Karp
+(ratio de cycle max) si la précision des nids doit monter.
