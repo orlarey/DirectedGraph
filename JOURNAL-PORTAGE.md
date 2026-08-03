@@ -563,3 +563,40 @@ intermédiaire, rapide et déterministe, qui évite le bruit de mesure ;
 (c) le correctif pressenti de l'étape C : chaîner les bancs
 verticalement par classe (colonnes de couleurs, la cohérence de phase
 de bf) plutôt que par régions de dominateurs seules.
+
+## 2026-08-03 (nuit) — étape 2 : les modes de l'étape C, et la monnaie qui se cache
+
+Mandat : corriger l'étape C à l'oracle assembleur. Trois mouvements et
+une leçon d'humilité expérimentale.
+
+1. VERTICAL (stagec=1, df sur le DAG des bancs) : deux records —
+   karplus32 1.17 (bat cs 1.27 sur son propre juge), frenchBell 1.77
+   (0.530 → ~0.48 en ratio). Mais réfute l'hypothèse « colonnes » sur
+   les stk : brass tombe à 13 SIMD.
+2. COUCHES (stagec=2, niveaux ASAP naturels + couleurs groupées dans
+   le niveau — « bf trié par formes ») : le déphasage est bien le
+   coupable du SIMD stk — brass remonte de 25 à 125 instructions
+   vectorielles (bf : 152), runtime 2.13 → 1.82 ; vocoder = bf. Le
+   groupage par fréquence de l'étape A arrachait les instances à leur
+   niveau naturel, déphasant leurs voies d'opérandes.
+3. CONTRE-EXEMPLE clarinet-stk : couches 124 SIMD, align 58 — et
+   align gagne de 26 %. Preuve par -fno-slp-vectorize : align sans
+   SLP = align avec SLP (1.70 ≈ 1.69). Sur la classe sérielle, le
+   SIMD ne compte PAS. Puis cinq suspects statiques éliminés un à un :
+   spills (anti-corrélé : align gagne avec PLUS de pile), churn de
+   tableaux (plat), manipulations de lanes (plat), dilatation du
+   chemin critique mono-chaîne (plate ; karplus-couches 4.7× plus
+   lent à dilatation égale), schedulingcost Σd² (ANTI-corrélé :
+   karplus-couches meilleur score, pire temps). La deuxième monnaie
+   est DYNAMIQUE ; suspect principal : le store-to-load forwarding à
+   travers les tampons de retard (la récurrence passe par la mémoire,
+   l'ordre change la distance écriture→relecture dépendante).
+   Prochaine arme : compteurs matériels (xctrace) sur la paire
+   clarinet-stk align/couches.
+
+Bilan pragmatique : aucun mode unique ne gagne partout, mais la
+FAMILLE {cs, vertical, couches, align} couvre tous les juges mesurés.
+L'adaptativité par région reste la cible architecturale ; en
+attendant, la sélection empirique par programme (3-4 modes générés,
+départagés à l'oracle + mini-bench) est déployable. Tout est commité
+et synchronisé (standalone + tlib + signals + faust, banc vert).
