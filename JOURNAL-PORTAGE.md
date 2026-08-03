@@ -366,6 +366,26 @@ instances d'une forme peuvent dépendre entre elles) ; le raffinement
 suivant = tailles de bancs ajustées par indépendance (antichaînes par
 classe de forme). Le mouvement Bank a sa matière première mesurée.
 
+### 2026-08-03 — alignschedule v1 : l'alignement des formes (Yann)
+
+Formalisation de l'idée de Yann (les formes comme couleurs, regroupées
+en rangs monochromes en respectant l'ordre topologique) : intervalles
+de mobilité [ASAP, ALAP], classes par fréquence décroissante, stabbing
+d'intervalles par classe (polynomial), rangs-cibles comme PRIORITÉS
+d'un Kahn (validité par construction). Cadeau structurel : un rang est
+une antichaîne — l'indépendance des bancs est gratuite.
+
+Banc : large(16,6,R4) -> fill 100 %, isoadj 90, AU-DELÀ de l'optimum
+tuilé (72) — rangs monochromes pleine largeur, crête 16 que la machine
+OoO réelle ne facture pas. Graphe réel : vocoder v1 ÉCHOUE (fill 49 %,
+crête 259, 5.49 vs df 4.09 intra-run) — l'accaparement couleur-d'abord
+cale sur le tissu conjonctif et les dépendances partagées ; clarinet
+0.63 (×2.8 sous les fixes, cs 0.374 reste maître). Méthode : famille
+banc+tissu au banc d'étalonnage pour itérer (placement ASAP-side vs
+ALAP-side du stabbing, interaction classes-tissu). NOTE dérive : bf
+vocoder 1.14 le matin, 1.87 le soir — thermique ; ratios intra-run
+seulement.
+
 ### À suivre
 
 - Dossier 2 (déterminisme) : digraph<N, Compare> de bout en bout.
