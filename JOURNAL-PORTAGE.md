@@ -751,3 +751,16 @@ erreur de cap) ; la compréhension mécanique attend les compteurs
 matériels. Le modèle à ressources garde ses deux étages sains :
 recMII choisit le régime (validé : zita, jprev exacts), l'autotuning
 choisira le cap.
+
+## 2026-08-04 (minuit passé) — costly-3 : l'enveloppe des deux moteurs, 0.750
+
+Première rencontre des ordres classiques avec la famille costly.
+TOUS les perdants de la fusion tombent par l'ordre seul : vocalFOF
+1.179 → 0.458 (×2.2, hybride R2U4 — les bancs de grains FOF),
+pluckedString 1.317 → 0.862 (align), les quatre vocals en bloc,
+virtualAnalog neutralisé (1.001). La fusion garde ses monstres à
+pression (2dKirchhoff 0.820 — le monolithe FDS est un nid géant
+qu'aucun ordre n'aide, seul l'éclatement le soulage ; reverbTank
+0.926). Enveloppe {fusion, ordre} : DIX SUR DIX sans perte, geomean
+0.750. L'étage de garantie a sa forme définitive : choisir par
+programme entre les deux moteurs. Zéro rejet SS_CHECK.
