@@ -496,3 +496,34 @@ quasi-parité aux deux pôles. Écart résiduel (+1.4 à +3.7 %) : le prix
 de l'approximation uniforme Rb ; le raffinement identifié est la
 pression PONDÉRÉE par la taille des bancs dans l'étape C (dpcombine et
 le tourniquet comptant des valeurs, pas des bancs).
+
+## 2026-08-03 (après-midi) — campagne famille : l'hybride seul passe sous 1
+
+Campagne mono-programme (rapports intermédiaires à Yann après chaque
+mesure), 26 entrées à CHEMINS EXPLICITES (les 22 des campagnes
+précédentes + les 4 homonymes de l'autre monde), 26 variantes,
+SS_CHECK à chaque génération (zéro rejet).
+
+Le verdict : enveloppe geomean 0.958 (première fois sous 1) ;
+l'HYBRIDE SEUL fait 0.981 — la famille à un paramètre bat en moyenne
+le meilleur fixe sans ses parents (align seul 1.215, cs seul 1.094).
+15/26 gains nets, 4 échecs restants (brass 1.209, spectralLevel 1.128
+— artefact de grille, R=1 coupé —, fdnRev 1.089, fire 1.054).
+Quatre échecs partagés de la veille tombent par l'hybride seul :
+bells 0.909, jprev 0.918, thunder 0.875, churchOrgan 0.992. Et
+frenchBell : −47 % (3.66 → 1.94 ms), bit-exact, reproduit — la plus
+grosse victoire du chantier ; align seul y fait 0.989 : le banc ne
+suffit pas, il faut la composition.
+
+Le curseur R interpole comme prévu (pôle localité R=2 : bells, jprev,
+zitaRev ; pôle rafales R=16-32 : thunder, brass-pm, vocoder). Les
+parents purs gardent les extrêmes : align les monstres à bancs longs
+(bells-it 0.883, clarinet-stk 0.896), cs les monstres récursifs
+(bowedString, karplus32-it) — le prix des plafonds uniformes et de
+Rb = R/cap. Raffinement identifié : pression PONDÉRÉE par la taille
+des bancs dans l'étape C.
+
+Note de méthode : clarinet-pm — dfcycles (f4) atteint 0.372 lui-même ;
+le « ×5 » est un ordre accessible, pas une exclusivité. Les quatre
+paires d'homonymes mesurées côte à côte : la structure décide du
+gagnant, pas le nom.
