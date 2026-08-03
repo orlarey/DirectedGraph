@@ -717,3 +717,20 @@ les 273 de fbell s'étirent le long des chaînes) — exactement les
 tailles de bancs naturelles que l'étape A/B calcule avant
 plafonnement. v2 : cap auto-calibré sur la distribution des largeurs
 naturelles, à l'intérieur de bankschedule, sans statistique externe.
+
+## 2026-08-03 (clôture) — la loi du cap : deux réfutations, un coupable nommé
+
+Après l'auto-régime v1 (recMII choisit le pôle : deux touches exactes,
+zita et jprev), la quête de la loi du cap dans le pôle rafales :
+1. Multiplicité des classes de formes : RÉFUTÉE (fbell 273→cap 8,
+   thunder 164→cap 32, bells 236→cap 2 — aucune monotonie).
+2. Largeur d'antichaîne naturelle (SS_BANKSTATS, l'instrument créé
+   pour la mesurer) : RÉFUTÉE aussi (fbell bancs de 112 → cap 8,
+   bells 93 → cap 2, thunder 77 → cap 32).
+Le motif survivant : les gagnants à petit cap (fbell, bells, karplus,
+jprev, zita) sont les programmes DENSES EN LIGNES À RETARD — le
+plafond y borne le nombre de tampons chauds simultanés. La loi du cap
+appartient à la TROISIÈME RESSOURCE (les flux de cache), absente du
+modèle. Le modèle complet visé : II = max(calcul/U, mémoire/M,
+récurrence, flux/S) — recMII choisit le régime, S choisira le cap.
+C'est la première pierre du chantier post-renouvellement.
