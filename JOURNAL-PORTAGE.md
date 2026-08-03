@@ -661,3 +661,11 @@ Et le croisement -ls-sched layers : résultat NÉGATIF documenté —
 les corps de boucles sont en régime de vectorisation de boucle
 (sur i), pas SLP ; la monnaie de phase du grain Tree ne s'y transfère
 pas. model reste le bon outil intra-boucle.
+
+## 2026-08-03 (fin de soirée) — costly-2 : le correctif RAW validé en campagne
+
+Rejeu de la campagne costly avec le correctif : 10/10 bit-exact, tous
+les programmes améliorés ou stables (piano1 0.98→0.91, reverbTank
+0.98→0.93, pluckedString 1.51→1.32, vocalBPMIDI 0.79), geomean
+enveloppe-ls/classique 1.073 → 1.030. Le bug des alias ne coûtait pas
+que la correction : il coûtait de la performance partout.
