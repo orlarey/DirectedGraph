@@ -527,3 +527,39 @@ Note de méthode : clarinet-pm — dfcycles (f4) atteint 0.372 lui-même ;
 le « ×5 » est un ordre accessible, pas une exclusivité. Les quatre
 paires d'homonymes mesurées côte à côte : la structure décide du
 gagnant, pas le nom.
+
+## 2026-08-03 (soir) — la vraie monnaie : ce que SLP empaquette vraiment
+
+Mandat : instrumenter la distribution des longueurs de rafales
+(packs4 = paquets complets de 4 iso-indépendants) et tester la
+corrélation sur les cas polaires. Résultat en deux temps :
+
+1. La métrique modèle SÉPARE LE CATASTROPHIQUE mais pas le sommet :
+   frenchBell et vocoder corrèlent, mais sur la classe stk (brass,
+   clarinet-stk, bells-it) le gagnant a MOINS de paquets-modèle que
+   l'hybride (brass : bf gagne avec 112 contre 206).
+2. L'assembleur tranche : le compte d'instructions SIMD .4s émises par
+   clang prédit le gagnant de CHAQUE paire polaire — brass bf 152 vs
+   hyb 25 (runtime 1.000 vs 1.286) ; clarinet-stk align 58 vs hyb 14
+   (0.896 vs 1.189) ; frenchBell hyb 127 vs align 24 vs df 0
+   (0.530 vs 0.989 vs 1.000). Corrélation parfaite, six sur six.
+
+Diagnostic : nos paquets comptent des rafales d'OPCODES isomorphes ;
+le SLP de clang empaquette des CÔNES use-def isomorphes aux voies
+d'opérandes cohérentes (les opérandes des 4 nœuds doivent eux-mêmes
+former des rafales, récursivement — sinon le coût des gathers tue le
+pack). bf préserve cette cohérence de phase par ses balayages
+niveau-major ; align la préserve quand ses couches de couleurs
+restent en phase ; l'étape C de l'hybride la DÉTRUIT en réordonnant
+les bancs par régions de dominateurs (les bancs d'une même colonne de
+couleur sont séparés).
+
+Conséquences pour l'étape 2 du plan : (a) le prédicteur modèle à
+construire est l'adjacence PROFONDE (paires iso dont les opérandes
+sont eux-mêmes iso et adjacents — calculable côté faust où l'ordre
+des sous-signaux est connu) ; (b) la cible de calibration n'est plus
+le runtime seul : le compte SIMD assembleur est un oracle
+intermédiaire, rapide et déterministe, qui évite le bruit de mesure ;
+(c) le correctif pressenti de l'étape C : chaîner les bancs
+verticalement par classe (colonnes de couleurs, la cohérence de phase
+de bf) plutôt que par régions de dominateurs seules.
