@@ -394,3 +394,33 @@ seulement.
   corpus (la campagne des ordres a l'infrastructure) ; envisager un
   paramètre de poids par nœud (les expressions n'ont pas toutes la
   même largeur).
+
+## 2026-08-03 — campagne finale, et le tirage rare qui divergeait
+
+La campagne définitive (22 programmes × 26 variantes, même session) :
+enveloppe {align, grille cs} contre meilleur fixe, geomean 1.016,
+15/22 dans la marge 1.02, 7 gains nets. Couronnes : align 7, cs 15.
+La chute du mur vocoder (align = bf, 1.003) est confirmée en campagne
+propre. Partition structurelle du corpus : l'alignement possède les
+bancs (SLP), le compositionnel possède les récurrences (karplus32 :
+align ×3.9 mais cs 0.978).
+
+Le fait du jour est ailleurs. La campagne a mesuré clarinet align à
+1.730 ms là où le record était 0.372. Sonde : 20 générations
+fraîches → 6 md5 distincts, TOUTES à 0.370–0.378 et bit-exactes. Le
+tirage de la campagne est rare — et il DIVERGE : 44097/44101 lignes,
+des zéros dès l'échantillon 3 (la boucle d'anche ne sonne pas), 510
+déclarations contre 117. Un tirage d'adresses peut donc produire un
+ordre INVALIDE : la rupture d'interblocage des cycles récursifs
+(Kahn en panne sèche → nœud pris dans l'ordre de l'ancre) ne casse
+pas toujours le cycle là où l'émission classique l'attend, et la
+sémantique du sample précédent bascule. Dix-neuf fois sur vingt
+l'ancre df mène au même point de rupture ; la vingtième, non.
+
+Conséquence doctrinale : le dossier déterminisme (digraph<N,Compare>
++ ordre structurel) cesse d'être de l'hygiène de mesure — c'est un
+dossier de correction. Et la contrainte est plus forte que « un ordre
+stable » : il faut que la rupture de cycles d'alignschedule soit
+ALIGNÉE sur celle de l'émission (mêmes arêtes arrière), pas seulement
+déterministe. Piste : hériter les points de rupture de l'ancre df au
+lieu de les redécouvrir en panne sèche.
