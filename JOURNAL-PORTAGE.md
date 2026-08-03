@@ -699,3 +699,21 @@ minima de retard (fdnRev : certificats dmin=1 pour des lignes de
 ressource, flux) et non de la récurrence. Prochaine marche : brancher
 le sélecteur dans bankschedule (régime par région), et Karp
 (ratio de cycle max) si la précision des nids doit monter.
+
+## 2026-08-03 (tard) — -ss 10 : l'auto-régime v1, deux touches et une leçon
+
+Le sélecteur recMII branché : -ss 10 mesure la borne de récurrence
+serrée et choisit son pôle (>= 45 : localité R2U4 ; sinon rafales
+R16U4). Contre les champions de grille : zita et jprev EXACTS,
+thunder à 3 % — mais le binaire est trop grossier : dans le pôle
+rafales le R gagnant va de 8 à 32 (vocoder 32, bellsit 16, fbell 8)
+et un R16 unique les trahit tous ; karplus (classe cache) et la
+paire stk restent hors modèle. Et la multiplicité brute des formes
+ne prédit PAS le R gagnant (fbell 273→8, thunder 164→32, bells
+236→2 : aucune monotonie) — réfutation propre de l'hypothèse
+histogramme. La bonne statistique identifiée en creux : la LARGEUR
+D'ANTICHAÎNE par classe (les 469 mul du vocoder sont parallèles,
+les 273 de fbell s'étirent le long des chaînes) — exactement les
+tailles de bancs naturelles que l'étape A/B calcule avant
+plafonnement. v2 : cap auto-calibré sur la distribution des largeurs
+naturelles, à l'intérieur de bankschedule, sans statistique externe.
