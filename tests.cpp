@@ -1884,3 +1884,65 @@ bool check33()
     }
     return reportCheck(33, ok);
 }
+
+//=============================================================================
+// check34 : bankschedule -- composition under constraint on an ALIGNED dag.
+// The hybrid must hold both crowns at once : match csschedule on chain
+// families (singleton banks degenerate into plain cs) and match
+// alignschedule on bank families (colors can no longer be dispersed).
+//=============================================================================
+
+bool check34()
+{
+    bool ok = true;
+
+    auto report = [&](const char* name, const digraph<int>& g, const std::vector<int>& s,
+                      unsigned R, unsigned U, std::function<long(const int&)> sh) {
+        schedule<int> S;
+        for (int n : s) {
+            S.append(n);
+        }
+        bool valid = isValidSchedule(g, S);
+        auto q     = squality(g, s, R, U, sh);
+        int  fill  = int(100.0 * double(s.size()) / (double(q.cycles) * U));
+        std::cout << "combine-lab  " << name << " : cycles " << q.cycles << " fill " << fill
+                  << "% peak " << q.peak << " isoadj " << q.isoadj
+                  << (valid ? "" : "  INVALID") << '\n';
+        ok = ok && valid;
+        return q;
+    };
+
+    // ---- bank family : the alignment crown
+    {
+        const int k = 4, d = 4, b = 4;
+        digraph<int>     g;
+        std::vector<int> opt;
+        bankblocks(k, d, b, g, opt);
+        auto sh = std::function<long(const int&)>(blockshape);
+        auto al = alignschedule(g, sh);
+        auto qa = report("blocs(4,4,4) align     ", g, al.elements(), k, 4, sh);
+        auto hy = bankschedule(g, k, 4, sh);
+        auto qh = report("blocs(4,4,4) hybride   ", g, hy.elements(), k, 4, sh);
+        ok      = ok && (qh.isoadj >= qa.isoadj);
+    }
+
+    // ---- wide chains under R : the compositional crown
+    {
+        const int k = 16, d = 6;
+        const unsigned R = 4, U = 4;
+        digraph<int> g;
+        for (int c = 0; c < k; c++) {
+            for (int t = 1; t < d; t++) {
+                g.add(c * 1000 + t, c * 1000 + t - 1, 0);
+            }
+        }
+        auto sh = std::function<long(const int&)>(bankshape);
+        auto cs = csschedule(g, R, U, sh);
+        auto qc = report("large(16,6,R4) cs      ", g, cs.elements(), R, U, sh);
+        auto hy = bankschedule(g, R, U, sh);
+        auto qh = report("large(16,6,R4) hybride ", g, hy.elements(), R, U, sh);
+        ok      = ok && (qh.peak <= qc.peak + int(R));
+    }
+
+    return reportCheck(34, ok);
+}
