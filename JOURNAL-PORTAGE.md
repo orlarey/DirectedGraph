@@ -972,3 +972,17 @@ flux à deux → métrique → purge par son arithmétique → hypothèse du
 budget → balayage manuel (record, constante mesurée) → terme dans
 l'oracle → l'oracle bat la main. La 4e ressource est passée du
 mystère au levier en une session.
+
+## 2026-08-08 — budget-S : la campagne de confirmation clôt l'arc des flux
+
+101 programmes × S ∈ {0, 8, 12, 16, 24} : ZÉRO régression > 3 % à
+toutes les valeurs ; 93 programmes indifférents (le garde-fou mord
+rarement) ; chaque morsure est un gain (karplus 1.059 → 0.829, m63
+−17 %, m53 −13 %). Défaut S=12 confirmé (optimal corpus réel) ; la
+constante machine est une ZONE 8-16, cohérente avec le balayage
+manuel. Les cases fusion de la carte v2 s'améliorent déjà — son
+optimum 21.5 µs/filtre est périmé dans le bon sens. L'arc de la 4e
+ressource — intuition, métrique, purge arithmétique, hypothèse,
+balayage, oracle, confirmation — est complet : deux jours entre « ça
+ne sert à rien d'avoir du SIMD si les flux ne suivent pas » et le
+garde-fou en production.
