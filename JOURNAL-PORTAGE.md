@@ -1054,3 +1054,29 @@ Résultat : merge-test 3→1 noyau (coefs repliés, intervalle L1 exact
 « sorties séparées » d'hier étaient une erreur de lecture : elles se
 somment) ; -ls -fir toujours linéaire, streams 3/2 ; code inchangé au
 byte près sans -fir. La barrière de fusion a maintenant son matériau.
+
+## 2026-08-07 (nuit) — les IIR se reconstituent (question de Yann : « tu as ajouté la reconstitution des Iir ? »)
+
+Non — porté mais ni branché ni adapté. Fait dans la foulée, trois
+leçons de couche payées :
+
+1. Sans horloges le motif est PLUS SIMPLE : la source du FIR doit être
+   la projection elle-même, par égalité de pointeur (hash-consing).
+2. IIRRevealer n'overridait pas transformation → la traversée par
+   défaut re-remplissait rec(var,...) → erreur d'immutabilité tlib sur
+   191/199 programmes. Même protocole que ses frères : ref() + rec()
+   unique.
+3. SIGSEGV sur groupes imbriqués : isDependingOn déplie les définitions
+   des projections — nth sur le corps NULL d'un groupe englobant encore
+   ouvert. Une garde superficielle ne suffit pas (marche transitive) et
+   le cache global (gDependencies) serait empoisonné par des résultats
+   calculés à mi-révélation. Remplacé dans revealIIR par une marche
+   locale conservatrice : corps ouvert = dépendance supposée → le
+   candidat tombe, jamais de faux IIR. (fir18 passait par nth(nil)=nil
+   → sous-approximation silencieuse : il pouvait en principe construire
+   un IIR faux sur groupes imbriqués ; notre choix est l'inverse.)
+
+Résultat : 902 IIR reconnus sur le corpus (zitaRev 6, filterBank 10,
+freeverb 0 — imbriqué, attend la seconde passe sur arbre clos),
+199/199, byte-identique. En attente : typage IIR (règle de domaine de
+point fixe), seconde passe pour les groupes imbriqués.
