@@ -797,3 +797,39 @@ chaînes parallèles sous OoO, SLP, zéro réduction horizontale). La
 fusion isomorphe en boucles a un plafond mesuré négatif ; la
 reconnaissance garde ses usages d'analyse (barrières/coûts pour
 l'oracle, ensemencement) — enjeu modeste. Cinq mesures, une doctrine.
+
+## 2026-08-07 (après-midi) — le portage -fir, étage 1 : la reconnaissance en canal latéral
+
+Yann a tranché contre mon verdict initial, avec le bon argument :
+« plus d'information ne peut pas nuire — la façon d'émettre est autre
+chose et pourra être revue ». L'étage 1 est donc la reconnaissance
+PURE : -fir exécute revealFIR sur une copie de la liste préparée,
+publie SS_FIR (comptes, tailles) et jette la copie — code généré
+inchangé (9/16 bit-identiques, 7/16 dérive de noms frais seulement,
+7/7 vérifiés bit-exacts).
+
+Le portage a rencontré quatre contrats de couche, chacun instructif :
+1. L'ORDRE DU REGISTRE DE SIGNATURE EST PORTEUR : insérer
+   SIGFIR/SIGIIR/SIGSUM au milieu décale les index de tous les
+   symboles suivants et désaligne les tables de dispatch de l'algèbre
+   — le compilateur de base crashait sur vocoder SANS -fir.
+   Enregistrés en DERNIER, avec commentaire d'avertissement.
+2. L'IMMUTABILITÉ DES DÉFINITIONS RÉCURSIVES (tlib) : le protocole
+   déclarer-nil-puis-remplir de la branche source est interdit ici ;
+   l'idiome sanctionné (tree.hh) est ref() crée le groupe vierge,
+   UN SEUL rec() le remplit. FIRRevealer réécrit en conséquence.
+3. LA SIMPLIFICATION N'EST PAS UNE : leur sigs::simplify est un
+   simplificateur SIGLIB interne sûr ; le mapper sur notre
+   normalize/simplify lançait l'algèbre de typage complète sur des
+   nœuds qu'elle ne connaît pas (crash en profondeur d'impression
+   d'erreur). Étage 1 : identité (cosmétique pour la reconnaissance).
+4. PAS D'HORLOGES ICI : shims no-clock ; conséquence assumée, les
+   motifs IIR (qui exigent isSigClocked) sont inertes — la
+   reconnaissance IIR attendra des motifs sans horloge (étage 2).
+
+Récolte corpus : vocoder 64 FIR/128 taps, geq 104/164, frenchBell
+51/151, filterBank 48/78, par_fir_32 31/527 (maxtaps 32), karplus 34.
+Consommateurs prévus (étage 2) : barrières de l'oracle de fusion,
+ensemencement des bancs de l'hybride, sélecteur du mode auto, émission
+en somme équilibrée. Synchronisé : faust + signals standalone
+(SIGLIB), MODES.md à jour (contrat de maintenance honoré).
