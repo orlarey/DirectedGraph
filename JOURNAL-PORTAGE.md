@@ -1002,3 +1002,28 @@ m55 0.599 — le bench frais bat les tables d'hier). Coût : 3-33 s par
 programme. Les jumeaux vocoder/filterBank restent la preuve qu'une
 information statique discriminante manque — question de recherche
 ouverte ; en attendant, la mesure tranche, et bien.
+
+## 2026-08-08 (après-midi) — l'algèbre instruite, étape 1 : le typage (guidage Yann)
+
+Périmètre vérifié dans fir18 à la demande de Yann : FIR/IIR/SUM
+suffisent (SigClocked/OD/US/tuples = autres chantiers). Architecture
+découverte : notre typage passe TOUT par un dispatch générique unique
+(SignalDispatch::combine, signalAlgebra.hh) alimenté par l'enum
+SignalOpcode dont L'ORDRE SUIT L'ENREGISTREMENT — et le crash bizarre
+du jour de portage s'explique enfin : un opcode hors-enum tombait dans
+un switch indéfini (d'où le tree2int sur ForeignConstant).
+
+Implémentation : Fir/Iir/Sum ajoutés à l'enum (en dernier ✓) ; le cas
+Fir s'exprime PAR LES OPÉRATIONS EXISTANTES (c0*X + c1*X@1 + ... en
+valeurs) — une seule règle compositionnelle donne toutes les
+interprétations (nature, intervalles, 5 attributs) ; l'intervalle
+résultant est la borne L1, sûre (le gain fréquentiel max|H| de fir18
+est plus serré mais est un raffinement, pas une nécessité). Sum =
+repli de Add. Iir = unreachable bruyant (équation récursive : règle
+de domaine de point fixe quand la reconnaissance sans horloge
+existera, pas un cas de combine).
+
+Validation (sonde FAUST_SS_FIRTYPE, typeAnnotation de la copie
+révélée) : d10 → [-1,1] exact ; par_fir_32 → [-1/32,1/32] exact.
+Prochaine étape du guidage : la simplification (lever le shim,
+fusionner les noyaux frères).
