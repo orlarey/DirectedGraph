@@ -833,3 +833,24 @@ Consommateurs prévus (étage 2) : barrières de l'oracle de fusion,
 ensemencement des bancs de l'hybride, sélecteur du mode auto, émission
 en somme équilibrée. Synchronisé : faust + signals standalone
 (SIGLIB), MODES.md à jour (contrat de maintenance honoré).
+
+## 2026-08-07 (soir) — -fir étage 2a : les lignes à retard informées
+
+Premier consommateur de la reconnaissance, sur mandat de Yann (« la
+reconnaissance peut améliorer les décisions de fusion et
+l'implémentation des lignes à retard ») : le pont fFirFacts (arbre
+source → (portée de lecture, taps non nuls agrégés par source)) et la
+politique de tampon du moteur -ls : un FIR dense reconnu lit toute sa
+fenêtre à chaque échantillon — la disposition LINÉAIRE (lectures
+contiguës + un shift par chunk) est la forme vectorisable, l'anneau
+masqué la détruit. Mesuré : par_fir_32 sous -ls 0.281 → 0.094 ms (×3,
+36 anneaux → 0, bit-exact) ; tapiir (épars) garde ses anneaux ; les
+programmes fusion inchangés. Chausse-trappes du chemin : l'off-by-one
+du span (N+1 coefficients pour un retard max N), l'agrégation par
+source rendue nécessaire par le shim simplify-identité (les noyaux
+frères restent non fusionnés à l'étage 1, chacun porte un tap de
+l'union), et un −26 % fantôme de frenchBell démasqué en tirage de
+fusion (cinq tirages frais : 1.28 des deux côtés). Restent : les
+BARRIÈRES DE FUSION (l'autre moitié du mandat), l'ensemencement des
+bancs, l'algèbre à instruire (lèvera le shim et fusionnera les
+noyaux frères).
