@@ -894,3 +894,28 @@ d'abord, le régime ensuite — -ss 10 v1 ne voit que la moitié de
 l'espace. La carte historique (volet 8) n'opposait que classique et
 fusion ; la v2 valide la théorie des territoires née des campagnes
 réelles.
+
+## 2026-08-07 (tard) — la 4e ressource instrumentée : les flux
+
+Objectif fixé par Yann : améliorer le modèle en tenant compte des
+flux (« ça ne sert à rien d'avoir une instruction SIMD si les flux ne
+suivent pas »). Conception à deux : un flux = une suite d'accès dont
+l'adresse avance à chaque itération ; clé (tampon, retard/16) en
+lecture — les retards d'une même ligne de cache ne font qu'un flux —,
+le tampon en écriture ; les adresses fixes ne comptent pas.
+
+Deux étages implémentés : le compte exact par boucle -ls (annoté
+streams Nr+Mw dans le commentaire de chaque boucle) et le PIC FENÊTRÉ
+de l'émission classique (fenêtre de 64 instructions sur l'ordre émis
+— la version sensible à l'ordre, celle qui manquait à squality).
+
+Validation : karplus32 SÉPARE (df 13 / couches 33 / cs 13 pour des
+runtimes 1.28 / 5.49 / 1.27) — l'effondrement du mode couches sur ce
+programme, inexpliqué depuis le 3 août, a maintenant son chiffre, et
+le budget du préchargeur se lit entre 13 et 33 flux. Vocoder :
+muette à juste titre (40/39, égalité runtime). clarinet-stk : ne
+sépare PAS (52/55 pour 0.90/2.14) — le mystère stk résiste à sa
+septième sonde ; les compteurs matériels restent son rendez-vous.
+Raffinements en file : pondération par taille de tampon (les locaux
+gonflent les comptes -ls), corrélation corpus complète, et le terme
+de flux dans l'oracle de fusion (l'union des flux d'une contraction).
