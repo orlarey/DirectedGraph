@@ -919,3 +919,17 @@ septième sonde ; les compteurs matériels restent son rendez-vous.
 Raffinements en file : pondération par taille de tampon (les locaux
 gonflent les comptes -ls), corrélation corpus complète, et le terme
 de flux dans l'oracle de fusion (l'union des flux d'une contraction).
+
+### Post-scriptum flux — l'arithmétique de Yann purge la métrique
+
+« Pourquoi karplus-df n'a que 13 flux ? Il écrit 32 lignes à retard,
+donc 32W + 32R + 2W, non ? » — La question a d'abord éclairé le
+principe (13 = concurrence dans une FENÊTRE de 64 instructions, pas le
+total par échantillon : en df, 2-3 cordes actives à la fois pendant
+que les autres dorment), puis exposé deux défauts réels : les petites
+histoires à adresses fixes étaient comptées (exclusion maxDelay >= 16),
+et les lectures à retard variable étaient jetées (leur dmin certifié
+passe sous 1 -- ce sont des flux, clé propre). Après purge : fenêtre
+géante = 64 flux exactement (l'arithmétique retrouvée), et la
+séparation df/couches passe de 13/33 à 8/56 -- x7. Une vérification
+de plausibilité arithmétique vaut une campagne.
