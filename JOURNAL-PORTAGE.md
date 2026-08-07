@@ -877,3 +877,20 @@ alerte retirée). Les comparaisons RELATIVES du jour restent valides
 (même binaire des deux côtés) ; les temps absolus d'avant restauration
 sont à jeter. Le piège « jamais cmake . dans build/ » était documenté
 côté tlib ; il est maintenant payé côté faust aussi.
+
+## 2026-08-07 (fin de soirée) — la carte v2 : trois royaumes sur la vérité terrain
+
+Rejeu de la famille m<S><P> (81 programmes, 8 variantes, 648 mesures)
+sous tout l'arsenal. 57/81 cases gagnées, geomean 0.717, pointes ×3.7.
+La carte a trois royaumes : la FUSION règne à P≥6 (le parallélisme
+massif se met en boucles), les FIXES gardent le coin des petits
+programmes, et le bloc médian S≥5 × P3-6 est le royaume NOUVEAU de
+l'HYBRIDE (19 cases h2/h32) — la classe mixte « bancs de chaînes »
+confirmée sur vérité terrain synthétique. -fir sur la fusion :
+exactement nul (geomean 1.000, prédit : resonlp = FIR de 2-3 taps).
+L'auto v1 échoue (geomean 1.33, pires cas ×3.5 = il choisit un ordre
+où la fusion gagne) : le mode auto complet devra choisir le MOTEUR
+d'abord, le régime ensuite — -ss 10 v1 ne voit que la moitié de
+l'espace. La carte historique (volet 8) n'opposait que classique et
+fusion ; la v2 valide la théorie des territoires née des campagnes
+réelles.
