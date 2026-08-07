@@ -933,3 +933,25 @@ passe sous 1 -- ce sont des flux, clé propre). Après purge : fenêtre
 géante = 64 flux exactement (l'arithmétique retrouvée), et la
 séparation df/couches passe de 13/33 à 8/56 -- x7. Une vérification
 de plausibilité arithmétique vaut une campagne.
+
+## 2026-08-07 (nuit) — l'hypothèse du budget de flux : record karplus et constante mesurée
+
+Hypothèse de Yann : « si le préchargeur suit ~8 flux, le découpage
+optimal de karplus serait des boucles de quelques cordes, chacune df
+à l'intérieur. » Balayage construit à la main depuis les 38 boucles
+du -ls non-fusionné (fusion de G boucles de corde, temporaires
+renommés, bit-exact vérifié) :
+
+df 1.29 | G1 1.115 | G2 0.95 | G4 0.914* | G8 1.13 | G16 1.36 |
+G32 1.50 | fusion-actuelle 1.06
+
+G=4 (8 boucles de 4 cordes) : RECORD ABSOLU de karplus32, −28 % sur
+le meilleur de toutes les campagnes (≈1.27), −14 % sur l'oracle
+actuel (qui groupe par ~16 cordes : 29-37 flux, le double du budget).
+La dégradation entre G4 (≈9 flux/boucle) et G8 (≈17) encadre le
+BUDGET DU PRÉCHARGEUR : S ≈ 10-16 flux. Le principe de Yann est
+validé, la constante est mesurée. Marche suivante : le terme de flux
+dans l'oracle de fusion (seuls les tampons ≥ 16 flottants comptent —
+les petits locaux chauds de frenchBell ne doivent pas bloquer ses
+grandes fusions gagnantes) ; test de validation : l'oracle doit
+redécouvrir G≈4 seul.
