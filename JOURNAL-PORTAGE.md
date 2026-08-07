@@ -782,3 +782,18 @@ la RECONNAISSANCE en réserve — un FIR reconnu est un banc parfait,
 candidat futur pour nourrir l'hybride ou le sélecteur ; se rouvrira
 si cible FPGA/HLS (les options -huf/-fpga-mem-th trahissent cette
 origine). Rapport : campaign-firab-20260807/REPORT-FIRAB.md.
+
+## 2026-08-07 (suite) — le plafond de la fusion isomorphe : négatif
+
+Idée de Yann à évaluer : la reconnaissance FIR/IIR au service de la
+fusion des boucles isomorphes (N filtres de même forme → une boucle
+indexée ; SIMD entre instances + réduction des flux). Trois sondes de
+plafond À LA MAIN : karplus ragged (batté-transposé 1.22 vs fusion
+1.04 ; layout naïf ×6.7 par aliasing de sets L1 !), 32 un-pôles
+uniformes (batté ×2.24 !), 256 un-pôles (batté +23 %). Cohérent avec
+par_fir_32 et frenchBell côté FIR18 : LA FORME DÉROULÉE-ORDONNANCÉE
+BAT LA FORME BOUCLE à toutes les tailles réalistes (registres promus,
+chaînes parallèles sous OoO, SLP, zéro réduction horizontale). La
+fusion isomorphe en boucles a un plafond mesuré négatif ; la
+reconnaissance garde ses usages d'analyse (barrières/coûts pour
+l'oracle, ensemencement) — enjeu modeste. Cinq mesures, une doctrine.
