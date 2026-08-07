@@ -955,3 +955,20 @@ dans l'oracle de fusion (seuls les tampons ≥ 16 flottants comptent —
 les petits locaux chauds de frenchBell ne doivent pas bloquer ses
 grandes fusions gagnantes) ; test de validation : l'oracle doit
 redécouvrir G≈4 seul.
+
+### Post-scriptum budget — l'oracle dépasse la main
+
+Le terme de flux implanté dans l'oracle de fusion (refus des
+contractions dont l'union des flux réels dépasse 12 ; seuls les
+tampons d'historique >= 16 flottants comptent — le filtre de taille
+protège les grandes fusions gagnantes). Validation : l'oracle
+redécouvre le principe ET FAIT MIEUX que le balayage manuel — 9
+boucles à groupes non uniformes (~13 flux), 0.828 ms bit-exact :
+-22 % sur son choix d'avant, -35 % sur le record des campagnes, 9 %
+sous le G4 uniforme. Zéro régression (frenchBell, reverbTank,
+vocalBP, vocalFOF inchangés). L'arc complet en une soirée : intuition
+de Yann (les SIMD sans les flux ne servent à rien) → définition du
+flux à deux → métrique → purge par son arithmétique → hypothèse du
+budget → balayage manuel (record, constante mesurée) → terme dans
+l'oracle → l'oracle bat la main. La 4e ressource est passée du
+mystère au levier en une session.
