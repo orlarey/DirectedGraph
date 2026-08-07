@@ -764,3 +764,21 @@ qu'aucun ordre n'aide, seul l'éclatement le soulage ; reverbTank
 0.926). Enveloppe {fusion, ordre} : DIX SUR DIX sans perte, geomean
 0.750. L'étage de garantie a sa forme définitive : choisir par
 programme entre les deux moteurs. Zéro rejet SS_CHECK.
+
+## 2026-08-07 — FIR-A/B : la troisième voie évaluée, le portage décliné (proposition)
+
+Mandat de Yann : évaluer le portage des options FIR/IIR de la branche
+FIR18-new-tlib-new-signals (sigFIR/sigIIR signaux de première classe,
+revealFIR/revealIIR, -fir/-ff/-fls/-mfs/-irt + 8 autres options
+absentes chez nous). Campagne 10 programmes × 8 variantes, mêmes
+sources, deux binaires : -fir ne bat notre enveloppe QUE sur
+bandfilter (-11 %) ; il PERD sur son test vitrine par_fir_32 (la
+boucle d'accumulation est sérielle, la somme déroulée se fait
+SLP-iser en arbre) et DOUBLE frenchBell contre sa propre baseline
+(reconstruction IIR en anneaux) ; geomean meilleur-fir/notre-meilleur
+1.596 ; la reconstruction réassocie (5/10 divergents bit-à-bit).
+Verdict proposé : ne pas porter l'émission (dominée sur CPU) ; garder
+la RECONNAISSANCE en réserve — un FIR reconnu est un banc parfait,
+candidat futur pour nourrir l'hybride ou le sélecteur ; se rouvrira
+si cible FPGA/HLS (les options -huf/-fpga-mem-th trahissent cette
+origine). Rapport : campaign-firab-20260807/REPORT-FIRAB.md.
