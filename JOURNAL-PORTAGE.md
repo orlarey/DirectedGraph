@@ -854,3 +854,26 @@ fusion (cinq tirages frais : 1.28 des deux côtés). Restent : les
 BARRIÈRES DE FUSION (l'autre moitié du mandat), l'ensemencement des
 bancs, l'algèbre à instruire (lèvera le shim et fusionnera les
 noyaux frères).
+
+## 2026-08-07 (nuit) — étage 2b : la barrière armée, et une chasse au fantôme instructive
+
+La barrière de fusion est en place : l'oracle -ls-fuse refuse les
+contractions qui mélangent un bloc-noyau (dominé par des lectures de
+taps FIR reconnues) avec du code étranger. Verdict honnête sur le
+corpus du jour : ELLE NE MORD NULLE PART — les noyaux réels sont
+petits (biquads, 1-3 taps) ou vivent dans les boucles de sortie (les
+sommes de par_fir_32 ne sont pas matérialisées). Protectrice, gratuite
+(mesurée), en attente de matériau à sa taille. Les taps par membre
+sont précalculés une fois (les contractions ne font que sommer).
+
+La soirée a surtout payé une leçon : une « régression ×7 du temps de
+compilation » a été traquée à travers commits et worktrees (dont deux
+faux verdicts sur binaires périmés — les worktrees exigent leur
+re-glob cmake) pour conclure à MON erreur d'opérateur : un `cmake .`
+nu dans build/ avait silencieusement perdu CMAKE_BUILD_TYPE — le
+compilateur tournait en -O0 depuis midi. Release restauré : reverbTank
+fuse 8 s (= costly-2), fdnRev 2 s (les « 33 s » de midi : artefact,
+alerte retirée). Les comparaisons RELATIVES du jour restent valides
+(même binaire des deux côtés) ; les temps absolus d'avant restauration
+sont à jeter. Le piège « jamais cmake . dans build/ » était documenté
+côté tlib ; il est maintenant payé côté faust aussi.
