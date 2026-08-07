@@ -1027,3 +1027,30 @@ Validation (sonde FAUST_SS_FIRTYPE, typeAnnotation de la copie
 révélée) : d10 → [-1,1] exact ; par_fir_32 → [-1/32,1/32] exact.
 Prochaine étape du guidage : la simplification (lever le shim,
 fusionner les noyaux frères).
+
+## 2026-08-07 (soir) — la simplification levée, les noyaux frères fusionnent
+
+Yann recadre : les FIR/IIR sont des MACROS (fir(x,c0,c1,...) =
+c0*x+c1*x@1+...) reconstruites APRÈS la simplification — cohérent avec
+la règle de typage (la macro dans le domaine des valeurs) et avec le
+fait que simplify, s'il croisait un FIR, le développerait (sémantique
+littérale).
+
+Levée du shim : 15 crashs corpus (assert rewrite.hh:131, body==nullptr)
+— simplify recevait des références récursives OUVERTES pendant la
+descente du révélateur. La garde dérivable du contrat : recSafeSimplify
+= isRecFree(t) ? simplify(t) : t (le bit synthétisé du chantier tlib
+sert exactement ici). 199/199 ensuite.
+
+Fusion des frères : la règle n'écoute que les SigSum n-aires — chaînon
+manquant revealSum (fir18 le passait AVANT revealFIR). Porté (114
+lignes, idiome ref()+rec() unique, recSafeSimplify). Piège au passage :
+cmake -C ../backends/... depuis build/ échoue silencieusement (le bon
+chemin est backends/backends.cmake RELATIF À build/) → binaire stale,
+une validation à refaire.
+
+Résultat : merge-test 3→1 noyau (coefs repliés, intervalle L1 exact
+±0.9375 = somme des coefs) ; par_fir_32 31→UN noyau de 32 taps (mes
+« sorties séparées » d'hier étaient une erreur de lecture : elles se
+somment) ; -ls -fir toujours linéaire, streams 3/2 ; code inchangé au
+byte près sans -fir. La barrière de fusion a maintenant son matériau.
