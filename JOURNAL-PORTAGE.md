@@ -986,3 +986,19 @@ ressource — intuition, métrique, purge arithmétique, hypothèse,
 balayage, oracle, confirmation — est complet : deux jours entre « ça
 ne sert à rien d'avoir du SIMD si les flux ne suivent pas » et le
 garde-fou en production.
+
+## 2026-08-08 (suite) — faustauto : le mode auto complet, validé 14/14
+
+L'architecture en deux couches décidée avec Yann est construite et
+validée. Couche statique : la signature SS_SIG (taille, recMII, flux
+réels, formes) élague en 3-4 candidats — moteur d'abord (la leçon de
+la carte v2), régime ensuite, et TOUJOURS les deux régimes d'ordre
+embarqués : la première validation (11/14) a montré que les trois
+ratés (m55, clarinet-stk, pluckedString) avaient tous leur vrai
+gagnant dans le régime absent de la liste ; corrigé, 14/14. Couche
+mesurée : bench éclair alterné, gagnant émis. Plusieurs sorties
+MEILLEURES que l'oracle des campagnes (vocoder 1.14, plucked 6.21,
+m55 0.599 — le bench frais bat les tables d'hier). Coût : 3-33 s par
+programme. Les jumeaux vocoder/filterBank restent la preuve qu'une
+information statique discriminante manque — question de recherche
+ouverte ; en attendant, la mesure tranche, et bien.
