@@ -1187,3 +1187,36 @@ justifiaient la fonction se dissolvent à l'examen : FIR inconditionnel
 design : quand un hook ne fait que consulter un registre par symbole,
 c'est que le registre EST la bonne interface — attacher la donnée au
 symbole supprime le code.
+
+## 2026-08-08 (suite) — les reveals sur le parcours générique : « ça va être beaucoup plus élégant ! »
+
+Migration des trois révélateurs sur la machinerie tlib (design déroulé
+avec Yann sur trois questions successives, chacune affinant le plan) :
+
+1. Sa question « pourquoi ne pas descendre dans def(Wj) ? » a forcé la
+   preuve d'exactitude de l'élagage CFC : tout Rj rencontré dans x est
+   sous-terme de def(Wi) → l'arc Wi→Rj existe → « Rj retombe sur Wi »
+   ⟺ même CFC. Le cas « CFC différentes mais retombe quand même » est
+   impossible DANS CE CONTEXTE — l'élagage serait faux pour une requête
+   de dépendance arbitraire.
+2. Sa question « projections ou groupes ? » : projections — plus fin
+   que les letrec, un groupe multi-définitions se scinde en ses vraies
+   composantes. (Piste notée : normaliser les letrec en les scindant
+   selon leurs CFC — alors plan-groupes et index-projections
+   coïncideraient.)
+3. Sa préférence « le même mécanisme partout » : treeRewrite pour
+   Sum/FIR (règles bottom-up pures, le protocole rec artisanal
+   disparaît), treeRewritePaired pour IIR — rule(orig, rebuilt) est
+   taillé pour l'analyse-sur-P, et le MEMO exposé remplace les
+   re-descentes self() (la mécanique de la boucle à 8M de frames
+   disparaît par construction, pas par garde).
+
+Piège d'implémentation payé : à la construction du graphe, l'ensemble-vu
+doit être PAR MARCHE — un sous-arbre partagé entre deux définitions doit
+donner ses arcs aux DEUX (un ensemble global perdrait le second arc et
+sous-connecterait le graphe → candidature acceptée à tort).
+
+Gains : iir 833→837 (+4 récupérés en multi-définitions), fir 2898→2947
+(+49, la traversée générique descend uniformément), 199/199, témoins
+intacts, -ls -fir linéaire. Les reveals ne sont plus les derniers
+parcours artisanaux du chantier.
