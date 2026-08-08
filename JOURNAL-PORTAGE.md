@@ -1118,3 +1118,21 @@ programme. À instruire en priorité au réveil.
 Bilan : corpus 199/199 stable ×3, 902 IIR. Diff outillé du jour :
 crash reports .ips (rapides) > lldb (lent) ; sondes fenêtrées
 SS_CYCLE (période 4 lue directement dans le flux).
+
+## 2026-08-08 — « pourquoi n'avons-nous plus ça ? » : la barrière accidentelle
+
+Question de Yann sur la garde perdue. Vérification sur pièces : ma
+phrase d'hier était FAUSSE (les gardes d'ordre des règles mul sont
+identiques). Le vrai mécanisme fir18 : les enveloppes CLK(h,y) des
+sources faisaient échouer structurellement les replis SANS garde
+(isDivisibleBy, clés de fusion) — des barrières accidentelles. Preuve :
+fir18 sur drumkit émet `iTemp0 * fir` (condition hors du noyau), zéro
+IIR. Notre port sans horloge a retiré les enveloppes → le chemin sans
+garde a laissé passer un coefficient d'état.
+
+Leçon (cousine de « correctif dérivable ») : en retirant une couche
+(les horloges), on perd aussi ses effets de bord protecteurs — il faut
+réénoncer les invariants qu'elle garantissait par accident. Fait : la
+garde d'ordre est posée AUX SITES DE REPLI (4 divisibilités + 2
+divisions), coefsFree en seconde ligne. Corpus 199/199, fir=2779,
+iir=902, témoins inchangés.
