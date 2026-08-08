@@ -234,7 +234,10 @@ void test1(std::ostream& ss)
 
 std::string res1()
 {
-    return "Tarjan partition of g = group{ A B C } group{ D E } group{ F G } group{ H } ";
+    // Components in COMPLETION order (deterministic, reverse-topological)
+    // since the dgorder change : a component is listed when Tarjan closes
+    // it, no longer re-sorted by a set-of-sets.
+    return "Tarjan partition of g = group{ A B C } group{ F G } group{ D E } group{ H } ";
 }
 
 bool check1()
