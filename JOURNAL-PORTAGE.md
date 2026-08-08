@@ -1348,3 +1348,16 @@ seul groupe de 200 défs à re-partitionner — à profiler un jour),
 reverbDesigner ×3.1 (0.7→2.1 s). jprev au défaut : 0.42 s. -etar ne
 gate plus que le regroupement interne à la boucle. Le canal -fir a
 perdu son appel redondant (iir 915 stable).
+
+## 2026-08-09 — perf du code généré : les simplifications paient
+
+Jalon 27/07 vs normalisé, 184 progr., bencharch 3 tours alternés :
+géomoyenne 0.990, 61 gains >3% / 25 pertes / 98 stables. Vedettes :
+clarinet ×0.46, korg35LPF ×0.59, les Labs ×0.80. Outlier dbmeter ×63.6
+ÉLUCIDÉ : le jalon n'émettait AUCUN de ses 8 bargraphs (0
+addVerticalBargraph dans son cpp !) — bug d'élimination silencieux de
+l'ère du jalon, le binaire du jour calcule les mètres. À instruire :
+quand perdu, quand restauré. Vraies pertes : famille oberheim/korg35
+×1.3-1.4, vocoder ×1.23, pluckedString ×1.17 — l'ordonnancement par
+défaut réagit aux nouvelles formes de groupes : matériau direct du
+chantier scheduling. Rapport : campaign-perfdefaut-20260809/.
