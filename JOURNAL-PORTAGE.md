@@ -1283,3 +1283,17 @@ divergences pré-existantes dont 7 GROSSIÈRES (famille EQ, err≥1.0 :
 parametricEqualizer 2.0, filterBank 1.98...) et jprev qui ne compile
 plus (120 s puis échec). Deux préalables avant toute décision pipeline.
 Rapport : campaign-etar-20260808/REPORT-ETAR.md.
+
+## 2026-08-08 (soir) — l'alarme EQ était un artefact de métrique
+
+Le « bug grossier de la famille EQ sous -eta » n'existe pas : ref
+laisse des résidus 5.6e-8 là où -eta produit des ZÉROS EXACTS (meilleur
+repli de constantes) — l'erreur relative brute divisait des poussières
+par des poussières. En absolu : max 2.7e-5 corpus entier, et 0 de
+relatif sur échantillons significatifs pour les EQ. AUCUNE divergence
+sérieuse, ni -eta ni -etar. Doctrine gagnée : toute campagne de
+correction lit DEUX métriques (absolue max + relative sur |ref|>1e-3).
+Cousin du « mensonge fidèle » : la fausse alarme naît d'une métrique
+qui dit vrai sur les nombres et faux sur le signal. Reste UN préalable
+réel : jprev (120 s → échec de compilation sous -eta). REPORT-ETAR
+révisé.
