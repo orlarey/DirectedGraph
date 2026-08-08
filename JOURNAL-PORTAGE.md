@@ -1270,3 +1270,16 @@ ne sert plus qu'à la sonde SS_SPLIT. Chiffres au bit près : 199/199,
 fir=3541, iir=915. La chaîne complète du jour : normalizeRecGroups
 (tlib) → reveals génériques → motif local. Prochaine discussion :
 l'insertion pipeline (décision Yann).
+
+## 2026-08-08 (fin d'après-midi) — campagne -etar : le procès a jugé -eta
+
+189 programmes, ref/eta/etar, plotarch bit-exact (-O3 -ffp-contract=off
+sans fast-math). Structurel : -etar enlève 32% des groupes (4909→3338 ;
+fdnRev 355→3, pluckedString 155→5) là où -eta seul enlève 1%. Part
+propre de -etar : 4 programmes, 3 au niveau arrondi + zitaRevFDN 6.5e-2
+(amplification FDN, à qualifier par décroissance d'énergie). MAIS la
+campagne a surtout donné à -eta son premier procès systématique : 41
+divergences pré-existantes dont 7 GROSSIÈRES (famille EQ, err≥1.0 :
+parametricEqualizer 2.0, filterBank 1.98...) et jprev qui ne compile
+plus (120 s puis échec). Deux préalables avant toute décision pipeline.
+Rapport : campaign-etar-20260808/REPORT-ETAR.md.
