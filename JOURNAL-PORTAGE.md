@@ -1260,3 +1260,13 @@ Découpage validé par Yann le matin, exécuté dans la journée :
    (sous-arbre partagé entre deux défs = arcs des DEUX).
 L'insertion dans le pipeline principal reste une décision séparée
 (chiffres en main : partage, typage point fixe, scheduling).
+
+## 2026-08-08 — revealIIR réduit à son motif local
+
+Sur arbre normalisé, le théorème de Yann effondre l'analyse : hôtes =
+letrec mono-définition, indépendance de x = « ne contient pas Wi
+littéralement » (recherche d'arbre, projections-feuilles). L'index CFC
+ne sert plus qu'à la sonde SS_SPLIT. Chiffres au bit près : 199/199,
+fir=3541, iir=915. La chaîne complète du jour : normalizeRecGroups
+(tlib) → reveals génériques → motif local. Prochaine discussion :
+l'insertion pipeline (décision Yann).
