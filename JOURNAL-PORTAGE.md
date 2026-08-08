@@ -1310,3 +1310,15 @@ tête de normalizeFixpoint → jprev 0.98 s, impulsionnelle 1e-7/44100.
 boucle, il répare son entrée. Le dossier -etar est complet : structure
 −32 %, correction arrondi partout, jprev réparé, coût ×1.12. Décision
 d'insertion : à Yann, tout est vert.
+
+## 2026-08-08 (nuit) — le miroir alimenté
+
+Yann : « ton idée de normaliser les récursions était brillante » — la
+vérité du journal : elle est née de SES questions (scission des letrec,
+puis « des récursions deviennent alpha-équivalentes, à réunifier par
+sym→deBruijn→sym ») ; ma part fut la soudure et la mécanique. DIALOG
+nourri pour le chapitre du guide : les 6 sections (l'emballage qui ment
+dans les deux sens, la scission comme condition du partage maximal,
+l'histoire jprev — la seule purement tlib —, les effets consommateur,
+les subtilités de conception, l'attribution sans noms). L'instance doc
+a maintenant tout ce que son côté du miroir ne peut pas voir.
