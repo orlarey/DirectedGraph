@@ -1172,3 +1172,18 @@ synchro, tests verts partout ; DIALOG : ACTION à l'instance doc (« les
 Au passage : le standalone signals ne buildait plus depuis la sync
 d'hier (simplify.hh absent de SIGLIB) — couture ajoutée (shim identité
 documenté, standalone-only). Leçon : SYNC SANS BUILD = SYNC NON FAITE.
+
+## 2026-08-08 (suite) — « pourquoi un hook ? » : la donnée bat la fonction
+
+Yann : « pourquoi ce n'est pas directement dans le constructeur ?
+je pensais que tu allais ajouter le champ de bits à la déclaration des
+nœuds ». Il avait raison — j'avais mis la connaissance dans une
+fonction (chaîne de comparaisons) au lieu d'une donnée. Refait : octet
+opaque sur le symbole, Signature::add(name, kinds) l'initialise DANS
+la déclaration, calcTreeContains le lit. Les deux conditionnels qui
+justifiaient la fonction se dissolvent à l'examen : FIR inconditionnel
+(redondant sous l'invariant assérté — jamais faux), FFUN inconditionnel
+(sur-approximation sûre). Chiffres au bit près identiques. Leçon de
+design : quand un hook ne fait que consulter un registre par symbole,
+c'est que le registre EST la bonne interface — attacher la donnée au
+symbole supprime le code.
