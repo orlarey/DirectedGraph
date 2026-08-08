@@ -1080,3 +1080,41 @@ Résultat : 902 IIR reconnus sur le corpus (zitaRev 6, filterBank 10,
 freeverb 0 — imbriqué, attend la seconde passe sur arbre clos),
 199/199, byte-identique. En attente : typage IIR (règle de domaine de
 point fixe), seconde passe pour les groupes imbriqués.
+
+## 2026-08-08 (tard) — la nuit des trois pièges : imbrication, cache tronqué, coefficients d'état
+
+Yann précise le design : revealIIR s'appuie sur revealFIR (def(Wi) =
+x + FIR[Wi,0,c1..]) et l'indépendance x⊥Wi revient à
+sigRecursiveDependencies. Et il nomme LA difficulté : fir18 révélait
+SANS renommer les variables récursives ; notre tlib immutable renomme.
+D'où l'architecture finale : analyse dans transformation(), sur
+l'arbre d'ENTRÉE clos (sortie de revealFIR), occurrences internes
+distinguées par le memo (groupe → ref ouverte).
+
+Trois pièges payés cette nuit :
+1. sigDependencies CACHE des résultats tronqués par underVisit : sur
+   des défs mutuellement récursives, une entrée du cycle garde à
+   jamais un ensemble incomplet → candidature acceptée à tort →
+   ré-entrée en vol → récursion infinie ordre-sensible (thunder tantôt
+   0, tantôt SIGBUS). Point de design soumis à Yann ; en attendant,
+   marche locale exacte-sur-clos (granularité groupe, sans cache).
+2. les COEFFICIENTS d'un candidat doivent être ⊥ de la projection :
+   drumkit/thunder ont des compteurs y=(y'≤14)·(...) — feedback non
+   linéaire emballé en « FIR » par revealFIR, et self(coef) bouclait
+   (sonde : 8,4M de frames). fir18 excluait ça par le typage horloge.
+   La garde explicite est aussi une correction de sens.
+3. pile : les traversées récursent à la profondeur du graphe — thread
+   dédié 2 Go + sondes SS_STACK/SS_DEPTH (FAUST_SS_FIRDEBUG).
+
+DÉCOUVERTE COLLATÉRALE MAJEURE : l'émission ocpp plain est
+NON-DÉTERMINISTE run-à-run (zitaRev/vocoder : deux compilations plain
+diffèrent — permutation des variables, mêmes structures ; karplus32
+stable car sans égalités d'ordonnancement). Ordre-pointeur + ASLR
+quelque part dans le scheduling. Ça brouille toute vérification
+byte-identique ET ça rejoint le dossier « nondéterminisme → perf » :
+nos benchs comparent peut-être des schedules différents d'un même
+programme. À instruire en priorité au réveil.
+
+Bilan : corpus 199/199 stable ×3, 902 IIR. Diff outillé du jour :
+crash reports .ips (rapides) > lldb (lent) ; sondes fenêtrées
+SS_CYCLE (période 4 lue directement dans le flux).
