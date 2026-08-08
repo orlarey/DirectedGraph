@@ -1220,3 +1220,22 @@ Gains : iir 833→837 (+4 récupérés en multi-définitions), fir 2898→2947
 (+49, la traversée générique descend uniformément), 199/199, témoins
 intacts, -ls -fir linéaire. Les reveals ne sont plus les derniers
 parcours artisanaux du chantier.
+
+## 2026-08-08 (nuit) — instruction letrec-par-CFC : la fusion cachée derrière la scission
+
+Sonde SS_SPLIT + campagne 199 programmes (post-simplification, comme
+demandé). Verdict en trois traits :
+1. La normalisation est autant FUSION que scission : 216 CFC
+   transversales aux letrec actuels — fdnRev = 355 groupes pour UN nœud
+   de 368 projections (la matrice du FDN) ; pluckedString 300 ;
+   partition idéale 3835 groupes contre 5210 actuels.
+2. 319 définitions non récursives emprisonnées (dissolvables →
+   partageables).
+3. Scission stricto sensu modeste : 260/521 groupes multi scindables,
+   90% des groupes déjà mono-déf.
+Théorème de Yann validé structurellement : après normalisation, hôtes
+IIR = les 3240 singletons auto-récursifs, et le test d'indépendance de
+x se trivialise (recherche d'arbre, plus d'index). Bonus scheduling :
+les gros nœuds révélés SONT les monstres à recMII des campagnes.
+Rapport : loop-splitting/measures/campaign-letrecscc-20260808/.
+Décision : à Yann.
