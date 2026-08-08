@@ -1322,3 +1322,15 @@ dans les deux sens, la scission comme condition du partage maximal,
 l'histoire jprev — la seule purement tlib —, les effets consommateur,
 les subtilités de conception, l'attribution sans noms). L'instance doc
 a maintenant tout ce que son côté du miroir ne peut pas voir.
+
+## 2026-08-08 (nuit) — l'insertion arbitrée : à la naissance de la forme symbolique
+
+Yann tranche le placement : juste après le deBruijn2Sym d'entrée de
+simplifyToNormalFormAux. Trois notes techniques posées et validées :
+canonical=true à cet endroit (on doit des noms canoniques à l'aval ;
+le tour interne est positionnel donc bon marché), la pré-passe de la
+boucle devient redondante (supprimée), le regroupement interne aux
+itérations reste. Validation : jprev 1.03s, zitaRev EN 7 groupes dès
+l'entrée de la boucle, corpus 199/199, impulsionnelles arrondi
+(karplus32 bit-exact). -etar est désormais l'architecture cible
+complète : naissance normalisée + point fixe simplifier⇄regrouper.
