@@ -1334,3 +1334,17 @@ itérations reste. Validation : jprev 1.03s, zitaRev EN 7 groupes dès
 l'entrée de la boucle, corpus 199/199, impulsionnelles arrondi
 (karplus32 bit-exact). -etar est désormais l'architecture cible
 complète : naissance normalisée + point fixe simplifier⇄regrouper.
+
+## 2026-08-08 (nuit) — la normalisation devient inconditionnelle, jugée par le jalon
+
+Proposition de Yann : supprimer la gate à l'entrée. Validé par le juge
+le plus dur disponible : le chemin PAR DÉFAUT du binaire du jour contre
+le jalon faust-20260727 (d'avant tout le chantier de la semaine).
+Verdict : 149/199 BIT-EXACTS à travers bit audio-rate + reveals
+génériques + normalizeRecGroups inconditionnel ; 49 au niveau arrondi
+(abs ≤ 1e-4) ; 0 sérieux ; compilation médiane ×0.99 (gratuite).
+Queues de distribution honnêtes : 2dKirchhoff ×3.3 (3.5→11.7 s, un
+seul groupe de 200 défs à re-partitionner — à profiler un jour),
+reverbDesigner ×3.1 (0.7→2.1 s). jprev au défaut : 0.42 s. -etar ne
+gate plus que le regroupement interne à la boucle. Le canal -fir a
+perdu son appel redondant (iir 915 stable).
