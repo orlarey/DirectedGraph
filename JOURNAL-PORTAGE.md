@@ -1297,3 +1297,16 @@ Cousin du « mensonge fidèle » : la fausse alarme naît d'une métrique
 qui dit vrai sur les nombres et faux sur le signal. Reste UN préalable
 réel : jprev (120 s → échec de compilation sous -eta). REPORT-ETAR
 révisé.
+
+## 2026-08-08 (soir) — jprev élucidé : le regroupement répare la boucle
+
+sample(1) sur le processus bloqué : sym2deBruijn, avant la première
+itération. Cause : 103 groupes scalaires formant un nœud de 90 — la
+conversion deBruijn de groupes SÉPARÉS mutuellement récursifs inline
+mutuellement (exponentiel sur chaînes profondes), un groupe n-aire se
+convertit positionnellement. Remède : pré-passe normalizeRecGroups en
+tête de normalizeFixpoint → jprev 0.98 s, impulsionnelle 1e-7/44100.
+-eta seul reste pathologique : -etar n'est pas qu'un client de la
+boucle, il répare son entrée. Le dossier -etar est complet : structure
+−32 %, correction arrondi partout, jprev réparé, coût ×1.12. Décision
+d'insertion : à Yann, tout est vert.
