@@ -1136,3 +1136,39 @@ réénoncer les invariants qu'elle garantissait par accident. Fait : la
 garde d'ordre est posée AUX SITES DE REPLI (4 divisibilités + 2
 divisions), coefsFree en seconde ligne. Corpus 199/199, fir=2779,
 iir=902, témoins inchangés.
+
+## 2026-08-08 — le bit audio-rate : « on tient quelque chose d'assez élégant »
+
+Design co-construit avec Yann en dialogue serré : tlib n'offre que le
+MÉCANISME (nibble utilisateur des 8 bits synthétisés + hook enregistré
+aveugle, union habituelle), le SENS reste aux signaux — le registre des
+signatures (sigs-config) devient porteur des masques, l'endroit
+générique par excellence (leçon de l'enum réinvestie).
+
+kinds(t) = tlibKind(t) | (hook(t) & kUserKinds) | ⋃ kinds(branches)
+
+Trois subtilités payées :
+1. « 1@1 est audio rate » (Yann) : les porteurs ne sont pas les
+   feuilles d'ordre 3 mais les constructeurs dont le RÉSULTAT est
+   audio-rate à arguments lents (delay compris).
+2. FIR conditionnel : masque seulement avec de vrais taps (« si ce
+   n'est pas une simple multiplication ») ; la forme FIR[x,c0] hérite,
+   sous invariant assérté dans sigFIR() — l'assert a d'abord cassé 109
+   programmes (chaînes slider:smooth = retards sur sources lentes),
+   preuve qu'il fallait le masque conditionnel, pas l'invariant seul.
+3. Projections : masque local OBLIGATOIRE — le corps d'un groupe est
+   une propriété, pas une branche : rien ne se propage à travers la
+   frontière du groupe par l'union.
+
+Validation croisée bit/getSigOrder sur le corpus (55k nœuds) : seuls
+désaccords = la règle select2 (ordre 3 inconditionnel — pessimiste, le
+bit a raison ; signalé à Yann, hors périmètre). Gardes basculées : 11
+sites O(1), le trou de drumkit fermé par construction. fir 2779→2898
+(+select2-d'UI repliables), iir 902→833 (−69 noyaux à coefficients
+variant dans le temps, rejet doctrinal correct). 3 copies tlib
+synchro, tests verts partout ; DIALOG : ACTION à l'instance doc (« les
+8 bits sont tlib-only » devient faux).
+
+Au passage : le standalone signals ne buildait plus depuis la sync
+d'hier (simplify.hh absent de SIGLIB) — couture ajoutée (shim identité
+documenté, standalone-only). Leçon : SYNC SANS BUILD = SYNC NON FAITE.
