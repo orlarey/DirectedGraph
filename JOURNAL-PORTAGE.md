@@ -1361,3 +1361,30 @@ quand perdu, quand restauré. Vraies pertes : famille oberheim/korg35
 ×1.3-1.4, vocoder ×1.23, pluckedString ×1.17 — l'ordonnancement par
 défaut réagit aux nouvelles formes de groupes : matériau direct du
 chantier scheduling. Rapport : campaign-perfdefaut-20260809/.
+
+## 2026-08-09 — le déterminisme d'émission acquis : dgorder<N>
+
+La racine du non-déterminisme run-à-run (zitaRev/vocoder compilés deux
+fois différaient) : digraph<N> — fNodes/fConnections en std::set/map
+NUS (ordre pointeur pour N=Tree) et operator< comparant des ensembles
+de pointeurs lexicographiquement → chaque départage d'égalité de chaque
+ordonnanceur suivait l'ASLR. Les huit conteneurs nus de compile_scal
+étaient innocents (appartenance/lookup seulement) — la maladie était un
+étage plus bas, dans la bibliothèque partagée.
+
+Le remède : trait dgorder<N> (défaut std::less<N>) traversant TOUS les
+conteneurs à clé N (digraph, Tarjan, schedules) ; operator< réécrit À
+TRAVERS le trait (piège : l'operator< d'un std::set compare les
+ÉLÉMENTS avec leur operator<, jamais avec le comparateur du set) ;
+partition de Tarjan en vector en ordre d'achèvement (un set de sets
+ré-ordonnait les composantes par adresses) ; tlib spécialise
+dgorder<Tree> = treeorder à côté de treeorder même.
+
+Preuves : 6 témoins ×5 compilations BYTE-IDENTIQUES ; corpus 199/199
+défaut et -fir (iir 915 stable) ; impulsionnelles vs jalon au niveau
+arrondi (karplus32 bit-exact). 4 copies DirectedGraph + 3 tree.hh
+synchronisées, tests verts partout (1 golden du standalone mis à jour :
+la partition s'imprime en ordre d'achèvement — même contenu). Le
+standalone est sur combine-lab ; le port vers main suit la discipline
+fetch+rebase de Yann. Toutes les campagnes futures gagnent un plancher
+de bruit propre — et la vérification byte-à-byte redevient un outil.
