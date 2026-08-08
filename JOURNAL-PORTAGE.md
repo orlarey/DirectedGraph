@@ -1239,3 +1239,24 @@ x se trivialise (recherche d'arbre, plus d'index). Bonus scheduling :
 les gros nœuds révélés SONT les monstres à recMII des campagnes.
 Rapport : loop-splitting/measures/campaign-letrecscc-20260808/.
 Décision : à Yann.
+
+## 2026-08-08 (après-midi) — normalizeRecGroups : la transformation atterrit dans tlib
+
+Découpage validé par Yann le matin, exécuté dans la journée :
+1. tlib : normalizeRecGroups (Tarjan des projections, condensation
+   dépendances-d'abord, dissolution des singletons non récursifs, ordre
+   canonicalTreeLess intra-CFC, tour deBruijn final). Le point de Yann —
+   « des récursions deviennent alpha-équivalentes, à réunifier par
+   sym→deBruijn→sym » — est le couronnement : la scission est la
+   CONDITION du partage maximal (jumeaux emprisonnés inéquivalents ;
+   minimaux, ils s'unifient au pointeur). Tests : 4 propriétés, chacune
+   vérifiée vivante par cassage volontaire.
+2. Premier consommateur : canal latéral -fir. fir 2947→3541 (+594),
+   iir 837→915 (+78), minimalité 0 violation/199, surcoût ≈ 0 (fdnRev
+   -1%, thunder +4% sur 70 ms).
+3. Restriction de domaine documentée : projections de groupes-listes
+   (les rec nus des tests généraux tlib sont hors-domaine, assertés).
+   Piège évité en construction du graphe : ensemble-vu PAR MARCHE
+   (sous-arbre partagé entre deux défs = arcs des DEUX).
+L'insertion dans le pipeline principal reste une décision séparée
+(chiffres en main : partage, typage point fixe, scheduling).
